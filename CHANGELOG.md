@@ -2,6 +2,16 @@
 
 All notable changes to Furby Open will be documented here.
 
+## [0.1.0-alpha.3] - 2026-07-14
+
+### Added
+
+- Nontechnical coding-agent installation runbook with explicit Telegram and Pi authentication gates
+- `CLAUDE.md` entry point alongside Codex-compatible `AGENTS.md`
+- Secure local Telegram setup and verification commands
+- Private, Git-ignored `.data/personality.md` override and guided personality interview
+- Guarded tagged-release updater with isolated validation and private-data backup
+
 ## [0.1.0-alpha.2] - 2026-07-14
 
 ### Added

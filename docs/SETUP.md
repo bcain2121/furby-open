@@ -34,13 +34,21 @@ Bootstrap creates a private `.env`, installs npm dependencies, and runs the buil
 
 ## 3. Create a dedicated Telegram bot
 
-1. Message `@BotFather` in Telegram.
-2. Run `/newbot` and follow the prompts.
-3. Copy the token into `TELEGRAM_BOT_TOKEN` in `.env`.
-4. Find your numeric Telegram user ID using a trusted ID bot or Telegram API method.
-5. Set `TELEGRAM_USER_ID`.
+Run the private interactive helper from your own terminal:
 
-Use a new bot token for this deployment. Do not share one token between multiple running assistants.
+```bash
+npm run setup:telegram
+```
+
+It explains the BotFather steps, hides your token while you enter it, verifies the new bot, asks you to send `/start`, discovers your numeric Telegram user ID from that private message, asks you to confirm the account, and writes both credentials directly to ignored `.env`.
+
+Verify later with:
+
+```bash
+npm run verify:telegram
+```
+
+Use a new bot token for this deployment. Never paste it into an AI-agent chat or share one token between multiple assistants.
 
 ## 4. Configure identity
 
@@ -52,6 +60,8 @@ ASSISTANT_LOCATION=Brooklyn, NY
 ```
 
 Use an IANA timezone such as `UTC`, `America/Los_Angeles`, or `Europe/London`.
+
+For private behavioral customization, create ignored `.data/personality.md`. A coding agent can interview you about tone, initiative, humor, boundaries, interests, and pet peeves, then show the proposed summary before saving it. See [`CUSTOMIZATION.md`](CUSTOMIZATION.md).
 
 ## 5. Authenticate a model
 
@@ -161,6 +171,10 @@ Then test optional features:
 - upload a PDF and ask for a summary
 - send a voice note
 - `/schedule in 1m do reply with scheduler test`
+
+## Install with a coding agent
+
+If you are using Codex, Claude Code, or another terminal-capable coding agent, give it the repository URL and ask it to follow [`INSTALL_WITH_AI.md`](INSTALL_WITH_AI.md). That runbook requires the agent to handle ordinary terminal work, explain BotFather and Pi authentication one step at a time, protect credentials, configure personality, validate the installation, and wait for approval before startup.
 
 ## 11. Keep the deployment isolated
 

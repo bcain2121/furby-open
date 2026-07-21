@@ -14,18 +14,28 @@ MOBILE_WORKSPACE_ROOT=nova-workspace
 
 Changing `MOBILE_WORKSPACE_ROOT` creates a new workspace path; move existing private files manually if needed.
 
-## Persona
+## Private personality
 
-Edit:
+Create this local, Git-ignored file:
 
 ```text
-src/config/system.md
-src/config/soul.md
+.data/personality.md
 ```
 
-Keep security and privacy rules in `system.md`. Put tone, interests, and communication preferences in `soul.md`.
+It is loaded after Furby Open's neutral public persona. Put individual preferences here, such as:
 
-You can also ask the assistant to use the bundled `assistant-customizer` skill while coding mode is enabled. Review all proposed changes before accepting them.
+- concise versus detailed replies
+- formal, relaxed, playful, or direct tone
+- how proactive the assistant should be
+- interests and recurring workflows
+- behaviors, phrases, or habits to avoid
+- boundaries for when it should ask before acting
+
+Do not put tokens, passwords, financial details, or unnecessary sensitive facts in the personality file.
+
+The tracked `src/config/system.md` and `src/config/soul.md` define public defaults. Change them only when contributing a generic behavior to the project; personalizing tracked files creates update conflicts and risks accidental disclosure.
+
+You can ask a coding agent to read the bundled `assistant-customizer` skill and interview you. It should show the proposed personality summary before writing `.data/personality.md`.
 
 ## Models
 

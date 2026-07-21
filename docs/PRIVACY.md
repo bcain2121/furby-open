@@ -11,12 +11,15 @@ The following are ignored by Git:
 - `.data/sessions/`
 - `.data/a2a/`
 - `.data/local/`
+- `.data/personality.md`
 - logs
 - Telegram uploads and generated workspace files
 - skills imported from Codex, Claude Code, or shared Agent Skills directories
 - `.pi/imported-skills.json`, which records local source and destination paths
 
 Pi credentials and global resources live outside the repository under `~/.pi/agent/`.
+
+Safe-update archives are written to the sibling `furby-open-backups/` directory by default. They may contain all of the private data above, including `.env`, and should receive the same protection as live credentials.
 
 ## Third parties
 

@@ -48,6 +48,7 @@ Repository
 ├── .env                                    private, ignored
 ├── .data/furby-open.db                     private, ignored
 ├── .data/sessions/                         private, ignored
+├── .data/personality.md                    private persona override, ignored
 ├── logs/                                   private, ignored
 └── furby-open-workspace/*                  private, ignored
 

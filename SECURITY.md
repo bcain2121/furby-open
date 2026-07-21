@@ -27,6 +27,8 @@ Furby Open is designed for one trusted operator on one computer.
 
 Only the numeric `TELEGRAM_USER_ID` in `.env` is allowed through the bot middleware. Use a dedicated bot token for each deployment. Do not run two deployments with the same token.
 
+Prefer `npm run setup:telegram` during installation. It accepts the token through a hidden local terminal prompt, verifies it directly with Telegram, discovers the owner ID only after a private `/start` message, asks for confirmation, and writes ignored `.env` without printing the token. Do not paste bot tokens into coding-agent chats.
+
 ### Safe mode
 
 The public default is `FURBY_OPEN_TOOL_MODE=safe`. It exposes only read-only capabilities selected by an explicit allowlist.
@@ -48,6 +50,10 @@ Recommended precautions:
 Skills are instructions to the model; Pi extensions/packages may execute code with the process user's permissions. Review third-party resources before installing them. Project-local starter skills in this repository are plain Markdown and should remain reviewable.
 
 The optional external-skill importer never runs imported scripts, excludes hidden Codex system skills, rejects symbolic links and oversized trees, and requires confirmation. These checks do not prove a skill is trustworthy. Review imported instructions and supporting files before resetting or restarting the assistant. Imported skills remain local and Git-ignored.
+
+### Updates
+
+Use `scripts/update.sh` rather than an unreviewed pull. It requires a clean source tree, validates a tagged fast-forward release in isolation, and backs up private runtime files before updating. Backups contain credentials and personal data; they are created with owner-only permissions outside the repository and must never be committed or shared.
 
 ### A2A
 

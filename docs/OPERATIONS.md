@@ -65,10 +65,37 @@ Runtime logs live under `logs/`. Structured lifecycle logs omit prompt content, 
 
 Use a unique Telegram bot token, root directory, database, workspace, PM2 process name, and A2A port for every installation. Never run two pollers with the same Telegram token.
 
-## Upgrade
+## Safe updates
 
-1. Back up `.data/furby-open.db` and `furby-open-workspace/`.
-2. Review release notes and dependency changes.
-3. Pull the update.
-4. Run `npm install`, build, tests, and doctor.
-5. Restart with updated environment variables.
+Check the newest tagged release without modifying the installation:
+
+```bash
+bash scripts/update.sh --check
+```
+
+Apply it:
+
+```bash
+bash scripts/update.sh --apply
+```
+
+Before changing the active checkout, the updater:
+
+1. refuses tracked or untracked source changes that could be overwritten
+2. fetches release tags from the configured `origin` and selects the newest `v*` tag
+3. requires the release to be a fast-forward from the installed commit
+4. installs and tests that release in an isolated Git worktree
+5. archives `.env`, `.data`, the workspace, and local skills to a private sibling `furby-open-backups/` directory
+6. stops an existing PM2 process when detected
+7. applies the update, runs `npm ci`, build, tests, and doctor
+8. restarts PM2 only after validation succeeds
+
+Ignored local personality, credentials, databases, sessions, workspace files, and imported skills remain outside Git and are included in the backup. The updater will not resolve conflicts, delete local source changes, or silently use an untagged development commit.
+
+Review the release notes before applying. To use a specific release rather than the newest one:
+
+```bash
+FURBY_OPEN_UPDATE_TAG=v0.1.0-alpha.2 bash scripts/update.sh --apply
+```
+
+If validation fails, do not delete private data or run an improvised hard reset. Keep the backup path printed by the updater and ask an installation agent to inspect the failure.

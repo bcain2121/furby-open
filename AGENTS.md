@@ -20,21 +20,24 @@ Furby Open is the public, reusable edition of a minimal Telegram personal assist
 
 ## Installation assistance
 
-When a user asks you to install this repository:
+When a user asks you to install this repository, assume they may not understand coding or terminal setup. Follow `docs/INSTALL_WITH_AI.md` stage by stage rather than merely pointing them at documentation.
 
-1. Read `README.md`, `docs/SETUP.md`, `SECURITY.md`, and `.env.example` before acting.
-2. Check Node.js and system dependencies with `bash scripts/check-system-deps.sh`.
-3. Run `bash scripts/bootstrap.sh`; do not start the bot yet.
-4. Guide the user through `npx pi` and the interactive `/login` flow. The user must complete provider/browser authentication themselves.
-5. Guide the user through creating a dedicated bot with Telegram `@BotFather` and finding their numeric Telegram user ID. The user must paste both values into their local `.env` themselves unless they explicitly ask for help editing it.
-6. Never request that credentials be pasted into chat, print `.env`, echo secret values, or commit credentials.
-7. Run `npm run skills:import -- --list`. Explain that external skills may contain scripts or provider-specific instructions. Import nothing unless the user reviews the candidates and approves the import.
-8. Run `npm run doctor`, explain each failure/warning, then run the build and tests.
-9. Start with `npm start` only after doctor has no blocking failures and the user approves startup.
+Required installer behavior:
+
+1. Read `README.md`, `docs/SETUP.md`, `docs/INSTALL_WITH_AI.md`, `SECURITY.md`, and `.env.example` before acting.
+2. Perform dependency checks, bootstrap, validation, and ordinary file setup yourself when tools permit it.
+3. Interview the user about assistant name, timezone, tone, initiative, boundaries, and preferences. Store their reviewed private personality in ignored `.data/personality.md`.
+4. Guide Telegram setup through `npm run setup:telegram`. If the agent terminal is not interactive, ask the user to run that command in their own terminal; never ask them to paste the bot token into agent chat.
+5. Guide `npx pi` interactively: explain provider choices, ask the user to enter `/login`, wait while they complete browser/device authentication, help them select a model with `/model`, and verify afterward. Mention potential provider billing before a smoke test.
+6. Never print `.env`, inspect `~/.pi/agent/auth.json`, echo secret values, request OAuth codes in chat, or commit credentials.
+7. Preview external skills with `npm run skills:import -- --list`; import nothing without explicit approval.
+8. Run doctor, build, tests, and credential verification. Explain every failure or warning in plain language.
+9. Start with `npm start` only after all blocking checks pass and the user approves startup.
 10. Keep safe mode as the default. Explain coding mode before enabling it.
 11. Never reuse another assistant's Telegram token, database, workspace, sessions, process name, or A2A port.
+12. Explain safe updates with `bash scripts/update.sh --check` and `bash scripts/update.sh --apply` before finishing.
 
-A web-only agent without shell access can provide commands and guidance but cannot perform the local installation. A coding agent with terminal access can perform the non-interactive steps.
+A web-only agent without shell access can provide commands and guidance but cannot perform the local installation. A coding agent with terminal access should own the non-interactive work and pause only for human authentication or approval.
 
 ## Validation
 

@@ -20,6 +20,7 @@ test('pi runtime contains stale-response guard and fresh session reset hooks', (
   assert.match(runtimeSource, /SessionManager\.create\(config\.rootDir, sessionDir\)/u);
   assert.match(runtimeSource, /messageStartIndex/u);
   assert.match(runtimeSource, /did not return a new response/u);
+  assert.match(runtimeSource, /\.data', 'personality\.md/u);
 });
 
 test('assistant response extraction never returns text from before the current prompt', () => {

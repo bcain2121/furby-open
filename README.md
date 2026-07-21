@@ -52,16 +52,20 @@ cd furby-open
 bash scripts/bootstrap.sh
 ```
 
-Edit the newly created private `.env`:
+Configure identity in the newly created private `.env`, then run the secure Telegram helper:
 
 ```env
 ASSISTANT_NAME=My Assistant
 ASSISTANT_OWNER_NAME=Alex
 ASSISTANT_TIMEZONE=America/New_York
 ASSISTANT_LOCATION=Brooklyn, NY
-TELEGRAM_BOT_TOKEN=your-new-bot-token
-TELEGRAM_USER_ID=123456789
 ```
+
+```bash
+npm run setup:telegram
+```
+
+The helper walks through BotFather, hides and verifies the token, discovers the owner's numeric user ID after they send `/start`, and writes credentials directly to ignored `.env`.
 
 Authenticate a model:
 
@@ -85,9 +89,9 @@ See [`docs/SETUP.md`](docs/SETUP.md) for the complete walkthrough.
 
 Point an agent with terminal access at the repository and use:
 
-> Read `AGENTS.md`, `README.md`, `docs/SETUP.md`, and `SECURITY.md`. Help me install Furby Open one step at a time. Run non-interactive checks and setup commands, but do not ask me to paste credentials into chat, do not display `.env`, and let me complete Pi `/login` and Telegram `@BotFather` authentication myself. Do not start the bot until `npm run doctor`, the build, and tests pass.
+> Install Furby Open from https://github.com/bcain2121/furby-open. After cloning, read `AGENTS.md` and follow `docs/INSTALL_WITH_AI.md` stage by stage. Assume I am nontechnical: perform safe terminal work yourself, explain the exact Telegram BotFather and Pi `/login` actions, pause for me at authentication steps, help me choose the assistant's personality, never ask me to paste secrets into chat, validate everything, and ask before starting the bot.
 
-The agent can install dependencies, run validation, diagnose failures, and provide exact commands. The user must complete provider authentication and obtain their own Telegram bot token/user ID. A web-only chatbot without terminal access can guide the process but cannot install software on the computer.
+Codex reads `AGENTS.md`; Claude Code is pointed to the same runbook by `CLAUDE.md`. The agent should own dependency installation and diagnostics while the user completes provider and Telegram authentication locally. A web-only chatbot without terminal access can guide the process but cannot install software on the computer.
 
 ## Security Modes
 
@@ -124,7 +128,9 @@ In coding mode, you can ask:
 
 > Create a project-local Pi skill that helps me summarize my weekly notes. Show me the files and validation before using it.
 
-See [`docs/EXTENDING.md`](docs/EXTENDING.md).
+Personal identity values live in ignored `.env`. Private tone and behavioral preferences can live in ignored `.data/personality.md`, which is loaded after the neutral public persona. The bundled customizer can interview the owner and prepare this file without changing public defaults.
+
+See [`docs/CUSTOMIZATION.md`](docs/CUSTOMIZATION.md) and [`docs/EXTENDING.md`](docs/EXTENDING.md).
 
 ### Import compatible Codex or Claude Code skills
 
@@ -138,6 +144,22 @@ npm run skills:import
 The importer accepts compatible `SKILL.md` packages only after confirmation, rejects symlinked or oversized skill trees, warns about Claude-specific features, and never imports hidden Codex system skills. Imported skills are local and Git-ignored. They may contain scripts or powerful instructions, so review them before use.
 
 For agent-driven setup, the installer is instructed to preview candidates and ask before importing anything.
+
+## Updating safely
+
+Check for a newer tagged release without changing the installation:
+
+```bash
+bash scripts/update.sh --check
+```
+
+Apply it:
+
+```bash
+bash scripts/update.sh --apply
+```
+
+The updater validates the release in an isolated worktree, backs up private data outside the repository, allows only a clean fast-forward update, reinstalls locked dependencies, and reruns build, tests, and doctor checks. See [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
 
 ## Architecture
 

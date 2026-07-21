@@ -120,7 +120,8 @@ export class FurbyPiRuntime {
     const modelResolution = await chooseModelResolution(this.modelRegistry, modelName, config.fallbackModel);
     const systemPromptPath = path.join(config.rootDir, 'src', 'config', 'system.md');
     const soulPromptPath = path.join(config.rootDir, 'src', 'config', 'soul.md');
-    const systemPromptParts = [systemPromptPath, soulPromptPath]
+    const localPersonalityPath = path.join(config.rootDir, '.data', 'personality.md');
+    const systemPromptParts = [systemPromptPath, soulPromptPath, localPersonalityPath]
       .filter((filePath) => fs.existsSync(filePath))
       .map((filePath) => fs.readFileSync(filePath, 'utf8').trim())
       .filter(Boolean);

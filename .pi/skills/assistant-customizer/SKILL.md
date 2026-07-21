@@ -11,13 +11,14 @@ Customize the current Furby Open checkout while preserving privacy and upgradeab
 
 1. Confirm the requested assistant name, owner display name, timezone, optional location, and desired tone.
 2. Read `.env.example`, `src/config/system.md`, `src/config/soul.md`, and `docs/CUSTOMIZATION.md`.
-3. Keep secrets in `.env`; never print, copy, or commit its values.
-4. Put identity and machine-specific values in `.env`.
-5. Put durable behavioral rules in `src/config/system.md` only when they should apply to every user turn.
-6. Put tone, interests, and communication preferences in `src/config/soul.md`.
-7. Do not weaken safe mode, Telegram user authentication, workspace confinement, or localhost network defaults.
-8. Show the proposed files and summarize changes before applying them when the request is broad.
-9. After changes, run:
+3. Interview the owner in plain language about tone, brevity, initiative, interests, boundaries, humor, and pet peeves. Offer examples when they are unsure.
+4. Keep secrets in `.env`; never print, copy, or commit its values. If Telegram credentials are already present, do not read `.env`; use the setup helpers or ask the owner to edit identity fields locally.
+5. Put identity and machine-specific values in `.env`.
+6. Put the owner's private tone, interests, communication preferences, and behavioral requests in `.data/personality.md`. This ignored local override is loaded after the public default persona.
+7. Change `src/config/system.md` or `src/config/soul.md` only when contributing a generic default that belongs in the public project, not for an individual installation.
+8. Do not weaken safe mode, Telegram user authentication, workspace confinement, or localhost network defaults.
+9. Show the proposed local personality summary before applying broad changes. Do not place secrets or unnecessary sensitive facts in the personality file.
+10. After changes, run:
 
 ```bash
 npm run build
