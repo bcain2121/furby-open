@@ -18,10 +18,12 @@ fi
 npm install
 npm run build
 npm test
+npm run skills:import -- --list
 
 printf '\nBootstrap complete. Next steps:\n'
 echo "1. Create a dedicated Telegram bot and edit .env."
 echo "2. Authenticate a model with 'npx pi' and /login, or configure an API key."
-echo "3. Run npm run doctor."
-echo "4. Optional: bash scripts/setup-local-whisper.sh."
-echo "5. Start with npm start or npx pm2 start ecosystem.config.cjs."
+echo "3. Optional: review/import Codex or Claude Code skills with npm run skills:import."
+echo "4. Run npm run doctor."
+echo "5. Optional: bash scripts/setup-local-whisper.sh."
+echo "6. Start with npm start or npx pm2 start ecosystem.config.cjs."

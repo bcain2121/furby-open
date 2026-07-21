@@ -13,6 +13,8 @@ The following are ignored by Git:
 - `.data/local/`
 - logs
 - Telegram uploads and generated workspace files
+- skills imported from Codex, Claude Code, or shared Agent Skills directories
+- `.pi/imported-skills.json`, which records local source and destination paths
 
 Pi credentials and global resources live outside the repository under `~/.pi/agent/`.
 

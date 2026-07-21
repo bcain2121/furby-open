@@ -15,6 +15,24 @@ Pi discovers them automatically for sessions rooted in this repository.
 - `assistant-customizer` guides safe persona and identity changes.
 - `skill-builder` guides creation and validation of a new project-local skill.
 
+## Import skills from other coding agents
+
+Codex CLI and Claude Code use the Agent Skills `SKILL.md` convention, but provider-specific extensions are not always portable. Preview candidates first:
+
+```bash
+npm run skills:import -- --list
+```
+
+Then run the confirmed importer:
+
+```bash
+npm run skills:import
+```
+
+The importer checks `~/.codex/skills/`, `~/.claude/skills/`, and `~/.agents/skills/`. It copies compatible skills into `.pi/skills/` without modifying the source. Imported skills and their local provenance manifest are Git-ignored.
+
+Warnings identify Claude-specific substitutions, frontmatter, and shell interpolation that Pi may not support. A copied skill is not automatically safe: inspect its instructions, scripts, dependencies, network access, and secret requirements before enabling it.
+
 ## Self-extension workflow
 
 1. Start in safe mode and describe the missing capability.

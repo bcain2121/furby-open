@@ -29,6 +29,12 @@ Furby Open keeps the core understandable: one Telegram bot, one local SQLite dat
 - Project-local starter skills for customization and skill creation
 - Health checks, retention cleanup, tests, and PM2 configuration
 
+## Dependencies
+
+All JavaScript dependencies are declared in `package.json` and reproducibly locked in `package-lock.json`; `npm install` or `npm ci` installs them. Furby Open does not vendor model credentials or operating-system packages.
+
+Required system dependencies are Node.js 22.19+, npm, `ffmpeg`, and Poppler's `pdftotext`. Local Whisper build tools and PM2 are optional. Run `bash scripts/check-system-deps.sh` or `npm run doctor` for exact detection.
+
 ## Quick Start
 
 ### Requirements
@@ -119,6 +125,19 @@ In coding mode, you can ask:
 > Create a project-local Pi skill that helps me summarize my weekly notes. Show me the files and validation before using it.
 
 See [`docs/EXTENDING.md`](docs/EXTENDING.md).
+
+### Import compatible Codex or Claude Code skills
+
+Furby Open can detect Codex CLI, Claude Code, and standard personal skill directories:
+
+```bash
+npm run skills:import -- --list
+npm run skills:import
+```
+
+The importer accepts compatible `SKILL.md` packages only after confirmation, rejects symlinked or oversized skill trees, warns about Claude-specific features, and never imports hidden Codex system skills. Imported skills are local and Git-ignored. They may contain scripts or powerful instructions, so review them before use.
+
+For agent-driven setup, the installer is instructed to preview candidates and ask before importing anything.
 
 ## Architecture
 

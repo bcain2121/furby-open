@@ -2,6 +2,16 @@
 
 All notable changes to Furby Open will be documented here.
 
+## [0.1.0-alpha.2] - 2026-07-14
+
+### Added
+
+- Detection of installed Codex CLI and Claude Code
+- Optional preview-and-confirm importer for compatible personal `SKILL.md` packages
+- Import safety checks for frontmatter, symbolic links, resource bounds, collisions, and provider-specific syntax
+- Git-ignore isolation and a local provenance manifest for imported skills
+- Installer-agent guidance for reviewing external skills before import
+
 ## [0.1.0-alpha.1] - 2026-07-10
 
 ### Added

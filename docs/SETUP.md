@@ -69,7 +69,40 @@ Use Pi's `enabledModels` setting for the `/model` quick selector. Furby Open fal
 
 By default, Furby Open loads only project-local skills committed under `.pi/skills/`. To deliberately include skills from `~/.pi/agent/skills/`, set `FURBY_OPEN_LOAD_GLOBAL_SKILLS=true` after reviewing those skills.
 
-## 6. Voice transcription
+## 6. Optional: import existing agent skills
+
+Furby Open detects these standard personal skill locations:
+
+```text
+~/.codex/skills/
+~/.claude/skills/
+~/.agents/skills/
+```
+
+Preview detected agents and compatible skills:
+
+```bash
+npm run skills:import -- --list
+```
+
+Run the interactive importer:
+
+```bash
+npm run skills:import
+```
+
+Target one source or skill when preferred:
+
+```bash
+npm run skills:import -- --source=codex
+npm run skills:import -- --skill=my-skill
+```
+
+The importer never silently trusts a skill. It excludes hidden Codex system skills, validates required Pi frontmatter, rejects symlinks and bounded-resource violations, warns about Claude-specific syntax, and asks for explicit confirmation. Imported skills are copied to `.pi/skills/`, recorded in a local ignored manifest, and ignored by Git.
+
+Review imported `SKILL.md` files and scripts before use. Restart the app or reset the Pi session after importing.
+
+## 7. Voice transcription
 
 Local Whisper is the default. Install it with:
 
@@ -84,7 +117,7 @@ TRANSCRIPTION_PROVIDER=openai
 OPENAI_API_KEY=your-key
 ```
 
-## 7. Validate
+## 8. Validate
 
 ```bash
 npm run doctor
@@ -95,7 +128,7 @@ npm run smoke:pi
 
 Doctor may warn about optional components. Fix every `FAIL` before startup.
 
-## 8. Start
+## 9. Start
 
 Foreground:
 
@@ -110,7 +143,7 @@ npx pm2 start ecosystem.config.cjs
 npx pm2 logs furby-open
 ```
 
-## 9. Telegram smoke test
+## 10. Telegram smoke test
 
 Send:
 
@@ -129,7 +162,7 @@ Then test optional features:
 - send a voice note
 - `/schedule in 1m do reply with scheduler test`
 
-## 10. Keep the deployment isolated
+## 11. Keep the deployment isolated
 
 Each checkout should use its own:
 

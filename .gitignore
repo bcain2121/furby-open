@@ -14,7 +14,13 @@ coverage/
 furby-open-workspace/*
 !furby-open-workspace/README.md
 
-# Local Pi package installs and settings are machine-specific; bundled skills remain tracked.
+# Local Pi package installs, settings, and imported skills are machine-specific.
 .pi/npm/
 .pi/git/
 .pi/settings.json
+.pi/imported-skills.json
+.pi/skills/*
+!.pi/skills/assistant-customizer/
+!.pi/skills/assistant-customizer/**
+!.pi/skills/skill-builder/
+!.pi/skills/skill-builder/**

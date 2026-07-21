@@ -3,6 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { config } from '../config/env.js';
 import { defaultDbPath, openDatabase } from '../db/database.js';
+import { detectExternalAgents, discoverExternalSkills, externalSkillSources } from '../skills/external-skill-importer.js';
 
 let failures = 0;
 let warnings = 0;
@@ -103,6 +104,24 @@ for (const command of ['node', 'npm', 'ffmpeg', 'pdftotext']) {
 for (const command of ['cmake', 'make', 'gcc', 'g++', 'pm2', 'pi']) {
   if (hasCommand(command)) pass(`${command} available`);
   else warn(`${command} missing or not on PATH`);
+}
+
+for (const agent of detectExternalAgents()) {
+  if (agent.installed) pass(`${agent.name} detected: ${agent.executablePath}`);
+  else warn(`${agent.name} not detected; external skill import from that agent is still possible if its skill directory exists`);
+}
+try {
+  const skillSources = externalSkillSources().filter((source) => source.exists);
+  const externalSkills = discoverExternalSkills();
+  const compatibleExternalSkills = externalSkills.filter((skill) => skill.compatible);
+  if (skillSources.length > 0) {
+    pass(`External skill directories found: ${skillSources.map((source) => source.label).join(', ')}`);
+  }
+  if (compatibleExternalSkills.length > 0) {
+    warn(`${compatibleExternalSkills.length} compatible external skill(s) available; review with npm run skills:import -- --list`);
+  }
+} catch (error) {
+  warn(`Could not inspect external agent skills: ${error instanceof Error ? error.message : String(error)}`);
 }
 
 if (config.transcriptionProvider === 'local') {

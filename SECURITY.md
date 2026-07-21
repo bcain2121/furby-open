@@ -47,6 +47,8 @@ Recommended precautions:
 
 Skills are instructions to the model; Pi extensions/packages may execute code with the process user's permissions. Review third-party resources before installing them. Project-local starter skills in this repository are plain Markdown and should remain reviewable.
 
+The optional external-skill importer never runs imported scripts, excludes hidden Codex system skills, rejects symbolic links and oversized trees, and requires confirmation. These checks do not prove a skill is trustworthy. Review imported instructions and supporting files before resetting or restarting the assistant. Imported skills remain local and Git-ignored.
+
 ### A2A
 
 The A2A endpoint is disabled by default. Its current protocol has no authentication. If enabled, keep `FURBY_OPEN_A2A_HOSTNAME=127.0.0.1` unless you have added an authenticated network boundary.
