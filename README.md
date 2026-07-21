@@ -75,6 +75,14 @@ npm start
 
 See [`docs/SETUP.md`](docs/SETUP.md) for the complete walkthrough.
 
+### Install with a coding agent
+
+Point an agent with terminal access at the repository and use:
+
+> Read `AGENTS.md`, `README.md`, `docs/SETUP.md`, and `SECURITY.md`. Help me install Furby Open one step at a time. Run non-interactive checks and setup commands, but do not ask me to paste credentials into chat, do not display `.env`, and let me complete Pi `/login` and Telegram `@BotFather` authentication myself. Do not start the bot until `npm run doctor`, the build, and tests pass.
+
+The agent can install dependencies, run validation, diagnose failures, and provide exact commands. The user must complete provider authentication and obtain their own Telegram bot token/user ID. A web-only chatbot without terminal access can guide the process but cannot install software on the computer.
+
 ## Security Modes
 
 Furby Open starts in **safe mode**:

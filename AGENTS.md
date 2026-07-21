@@ -18,6 +18,23 @@ Furby Open is the public, reusable edition of a minimal Telegram personal assist
 - The configured workspace stores uploads and user-facing files.
 - Project-local starter skills live under `.pi/skills/`.
 
+## Installation assistance
+
+When a user asks you to install this repository:
+
+1. Read `README.md`, `docs/SETUP.md`, `SECURITY.md`, and `.env.example` before acting.
+2. Check Node.js and system dependencies with `bash scripts/check-system-deps.sh`.
+3. Run `bash scripts/bootstrap.sh`; do not start the bot yet.
+4. Guide the user through `npx pi` and the interactive `/login` flow. The user must complete provider/browser authentication themselves.
+5. Guide the user through creating a dedicated bot with Telegram `@BotFather` and finding their numeric Telegram user ID. The user must paste both values into their local `.env` themselves unless they explicitly ask for help editing it.
+6. Never request that credentials be pasted into chat, print `.env`, echo secret values, or commit credentials.
+7. Run `npm run doctor`, explain each failure/warning, then run the build and tests.
+8. Start with `npm start` only after doctor has no blocking failures and the user approves startup.
+9. Keep safe mode as the default. Explain coding mode before enabling it.
+10. Never reuse another assistant's Telegram token, database, workspace, sessions, process name, or A2A port.
+
+A web-only agent without shell access can provide commands and guidance but cannot perform the local installation. A coding agent with terminal access can perform the non-interactive steps.
+
 ## Validation
 
 Before committing:
