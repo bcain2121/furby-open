@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_DIR="${FURBY_OPEN_HOME:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+
+if [[ ! -f "$APP_DIR/package.json" ]]; then
+  echo "Furby Open directory is invalid: $APP_DIR" >&2
+  exit 1
+fi
+
+cd "$APP_DIR"
+
+if [[ ! -d node_modules ]]; then
+  echo "Installing dependencies..."
+  npm install
+fi
+
+exec npm start -- "$@"

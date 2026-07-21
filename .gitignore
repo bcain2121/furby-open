@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.data/*
+!.data/.gitkeep
+logs/
+*.log
+.DS_Store
+coverage/
+
+# Runtime workspace content is private. Keep only the explanatory README.
+furby-open-workspace/*
+!furby-open-workspace/README.md
+
+# Local Pi package installs and settings are machine-specific; bundled skills remain tracked.
+.pi/npm/
+.pi/git/
+.pi/settings.json
