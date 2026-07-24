@@ -15,16 +15,13 @@ else
   echo ".env already exists; leaving it untouched."
 fi
 
-npm install
+npm ci
 npm run build
 npm test
 npm run skills:import -- --list
 
 printf '\nBootstrap complete. Next steps:\n'
-echo "1. Choose identity in .env and optional private personality in .data/personality.md."
-echo "2. Run npm run setup:telegram from an interactive terminal."
-echo "3. Authenticate a model with 'npx pi', /login, and /model."
-echo "4. Optional: review/import Codex or Claude Code skills with npm run skills:import."
-echo "5. Run npm run doctor and npm run verify:telegram."
-echo "6. Optional: bash scripts/setup-local-whisper.sh."
-echo "7. Start only after validation with npm start or npx pm2 start ecosystem.config.cjs."
+echo "1. For guided identity, Telegram, and Pi onboarding, run npm run setup."
+echo "2. Optional: review/import Codex or Claude Code skills with npm run skills:import."
+echo "3. Optional: bash scripts/setup-local-whisper.sh."
+echo "4. Start only after validation with npm start or npx pm2 start ecosystem.config.cjs."

@@ -26,8 +26,8 @@ check_optional() {
 
 check_required node "Install Node.js 22.19 or newer."
 check_required npm "Install npm with Node.js."
-check_required ffmpeg "Required for voice conversion."
-check_required pdftotext "Install poppler-utils for PDF extraction."
+check_optional ffmpeg "Needed for voice and media conversion; text chat still works without it."
+check_optional pdftotext "Needed for PDF extraction; install Poppler when you need PDFs."
 check_optional cmake "Needed only for local whisper.cpp."
 check_optional make "Needed only for local whisper.cpp."
 check_optional gcc "Needed only for local whisper.cpp."

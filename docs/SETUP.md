@@ -4,37 +4,44 @@
 
 Required:
 
-- Linux or macOS; Windows through WSL is currently experimental
-- Node.js 22.19+
-- npm
-- `ffmpeg`
-- `pdftotext` from Poppler
+- macOS, Windows 10/11, or a mainstream Linux distribution
+- Node.js 22.19+ and npm; the guided installer can add them
 - Telegram account
+- access to a Pi-supported model provider
 
-Optional:
+Optional feature dependencies:
 
+- `ffmpeg` for voice and media conversion
+- Poppler's `pdftotext` for PDF extraction
 - PM2 for daemon mode
 - CMake and a C/C++ toolchain for local Whisper
 
-Check your computer:
-
-```bash
-bash scripts/check-system-deps.sh
-```
+Text chat works without the optional feature dependencies.
 
 ## 2. Install
+
+The easiest path is the double-click or terminal installer in [`INSTALLER.md`](INSTALLER.md). It installs prerequisites, application files, and locked npm dependencies, then opens the shared setup wizard.
+
+Manual installation remains available:
 
 ```bash
 git clone https://github.com/bcain2121/furby-open.git
 cd furby-open
 bash scripts/bootstrap.sh
+npm run setup
 ```
 
-Bootstrap creates a private `.env`, installs npm dependencies, and runs the build and tests. It does not create credentials or start the bot.
+Bootstrap creates private local files and runs the build and tests. `npm run setup` guides identity, personality, Telegram, Pi login, and validation. Neither starts the bot automatically.
+
+Check macOS/Linux system tools manually with:
+
+```bash
+bash scripts/check-system-deps.sh
+```
 
 ## 3. Create a dedicated Telegram bot
 
-Run the private interactive helper from your own terminal:
+The shared `npm run setup` wizard launches this stage automatically. To run only the private Telegram helper from your own terminal:
 
 ```bash
 npm run setup:telegram
@@ -52,6 +59,8 @@ Use a new bot token for this deployment. Never paste it into an AI-agent chat or
 
 ## 4. Configure identity
 
+The guided setup asks these questions and writes only targeted local values. Manual equivalents are:
+
 ```env
 ASSISTANT_NAME=My Assistant
 ASSISTANT_OWNER_NAME=Alex
@@ -61,7 +70,7 @@ ASSISTANT_LOCATION=Brooklyn, NY
 
 Use an IANA timezone such as `UTC`, `America/Los_Angeles`, or `Europe/London`.
 
-For private behavioral customization, create ignored `.data/personality.md`. A coding agent can interview you about tone, initiative, humor, boundaries, interests, and pet peeves, then show the proposed summary before saving it. See [`CUSTOMIZATION.md`](CUSTOMIZATION.md).
+For private behavioral customization, use ignored `.data/personality.md`. The guided setup interviews you about tone, initiative, boundaries, interests, and pet peeves, shows the summary before saving it, and preserves the public security rules. See [`CUSTOMIZATION.md`](CUSTOMIZATION.md).
 
 ## 5. Authenticate a model
 
@@ -71,7 +80,7 @@ OAuth-backed setup:
 npx pi
 ```
 
-Enter `/login`, choose a provider, and complete authentication. Pi stores credentials outside this repository under `~/.pi/agent/`.
+Enter `/login`, choose a provider, and complete authentication. Use `/model` to select a model, then `/quit` to return to the setup wizard. Pi stores credentials outside this repository under `~/.pi/agent/`.
 
 You may instead set a supported API key in `.env`. Never commit `.env`.
 

@@ -13,7 +13,8 @@ function warn(message: string) { warnings += 1; console.log(`WARN ${message}`); 
 function fail(message: string) { failures += 1; console.log(`FAIL ${message}`); }
 
 function hasCommand(command: string) {
-  return spawnSync('bash', ['-lc', `command -v ${command}`], { encoding: 'utf8' }).status === 0;
+  const locator = process.platform === 'win32' ? 'where.exe' : 'which';
+  return spawnSync(locator, [command], { encoding: 'utf8', windowsHide: true }).status === 0;
 }
 
 function looksPlaceholder(value: string) {
@@ -97,9 +98,13 @@ if (fs.existsSync(settingsPath)) {
   warn(`Pi settings not found: ${settingsPath}`);
 }
 
-for (const command of ['node', 'npm', 'ffmpeg', 'pdftotext']) {
+for (const command of ['node', 'npm']) {
   if (hasCommand(command)) pass(`${command} available`);
   else fail(`${command} missing`);
+}
+for (const [command, feature] of [['ffmpeg', 'voice/media conversion'], ['pdftotext', 'PDF extraction']] as const) {
+  if (hasCommand(command)) pass(`${command} available`);
+  else warn(`${command} missing; ${feature} will be unavailable`);
 }
 for (const command of ['cmake', 'make', 'gcc', 'g++', 'pm2', 'pi']) {
   if (hasCommand(command)) pass(`${command} available`);

@@ -9,6 +9,7 @@ logs/
 *.log
 .DS_Store
 coverage/
+release-artifacts/
 
 # Runtime workspace content is private. Keep only the explanatory README.
 furby-open-workspace/*

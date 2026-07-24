@@ -16,7 +16,13 @@ Changing `MOBILE_WORKSPACE_ROOT` creates a new workspace path; move existing pri
 
 ## Private personality
 
-Create this local, Git-ignored file:
+Run the cross-platform guided interview at any time:
+
+```bash
+npm run setup
+```
+
+It shows the proposed summary before saving and does not display an existing Telegram token. To customize manually, create this local, Git-ignored file:
 
 ```text
 .data/personality.md

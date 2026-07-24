@@ -25,9 +25,9 @@ When a user asks you to install this repository, assume they may not understand 
 Required installer behavior:
 
 1. Read `README.md`, `docs/SETUP.md`, `docs/INSTALL_WITH_AI.md`, `SECURITY.md`, and `.env.example` before acting.
-2. Perform dependency checks, bootstrap, validation, and ordinary file setup yourself when tools permit it.
-3. Interview the user about assistant name, timezone, tone, initiative, boundaries, and preferences. Store their reviewed private personality in ignored `.data/personality.md`.
-4. Guide Telegram setup through `npm run setup:telegram`. If the agent terminal is not interactive, ask the user to run that command in their own terminal; never ask them to paste the bot token into agent chat.
+2. Prefer the platform installer in `docs/INSTALLER.md`; otherwise perform dependency checks, bootstrap, validation, and ordinary file setup yourself when tools permit it.
+3. Hand off to the shared `npm run setup` wizard in a normal user-controlled terminal. It interviews for identity/personality and saves the reviewed private summary in ignored `.data/personality.md`.
+4. The wizard launches secure Telegram setup. If the agent terminal is not interactive, ask the user to run `npm run setup` or `npm run setup:telegram` in Terminal/PowerShell/Command Prompt; never ask them to paste the bot token into agent chat.
 5. Guide `npx pi` interactively: explain provider choices, ask the user to enter `/login`, wait while they complete browser/device authentication, help them select a model with `/model`, and verify afterward. Mention potential provider billing before a smoke test.
 6. Never print `.env`, inspect `~/.pi/agent/auth.json`, echo secret values, request OAuth codes in chat, or commit credentials.
 7. Preview external skills with `npm run skills:import -- --list`; import nothing without explicit approval.

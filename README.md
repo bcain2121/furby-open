@@ -27,63 +27,53 @@ Furby Open keeps the core understandable: one Telegram bot, one local SQLite dat
 - Safe and coding capability modes
 - Optional localhost A2A JSON-RPC endpoint
 - Project-local starter skills for customization and skill creation
+- Cross-platform guided installer and private first-run setup
 - Health checks, retention cleanup, tests, and PM2 configuration
 
 ## Dependencies
 
 All JavaScript dependencies are declared in `package.json` and reproducibly locked in `package-lock.json`; `npm install` or `npm ci` installs them. Furby Open does not vendor model credentials or operating-system packages.
 
-Required system dependencies are Node.js 22.19+, npm, `ffmpeg`, and Poppler's `pdftotext`. Local Whisper build tools and PM2 are optional. Run `bash scripts/check-system-deps.sh` or `npm run doctor` for exact detection.
+The core text assistant requires Node.js 22.19+ and npm. The guided installers can add them. `ffmpeg` enables voice/media conversion and Poppler's `pdftotext` enables PDF extraction; both are optional for text chat. Local Whisper build tools and PM2 are also optional. Run `bash scripts/check-system-deps.sh` or `npm run doctor` for exact detection.
 
-## Quick Start
+## Guided Installer
 
-### Requirements
+The installer opens one guided terminal flow for dependencies, personality, Telegram, Pi model login, and validation. It pauses whenever you must use BotFather or a provider login, hides the Telegram token, keeps the assistant stopped until setup is complete, and can be rerun safely.
 
-- Node.js **22.19 or newer**
-- npm
-- `ffmpeg`
-- `pdftotext` from Poppler
-- A Telegram bot token and numeric Telegram user ID
-- At least one model authenticated through Pi or configured by API key
+### macOS — double-click
+
+1. Download and unzip the [macOS/Linux installer bundle](https://github.com/bcain2121/furby-open/releases/download/v0.1.0-alpha.4/Furby-Open-Installer-macOS-Linux.zip).
+2. Double-click **`Install-Furby-Open.command`**.
+3. If macOS blocks it, Control-click it, choose **Open**, then confirm **Open**.
+
+### Windows — double-click
+
+1. Download and unzip the [Windows installer bundle](https://github.com/bcain2121/furby-open/releases/download/v0.1.0-alpha.4/Furby-Open-Installer-Windows.zip).
+2. Double-click **`Install-Furby-Open.cmd`**.
+3. Approve Windows Package Manager prompts when you want the installer to add Git, Node.js, or FFmpeg.
+
+### Linux or terminal installation
+
+Download the installer, optionally inspect it, then run it:
+
+```bash
+curl -fL https://raw.githubusercontent.com/bcain2121/furby-open/v0.1.0-alpha.4/install.sh -o install-furby-open.sh
+less install-furby-open.sh
+bash install-furby-open.sh
+```
+
+It installs into `~/FurbyOpen` by default. On macOS/Linux, a missing Node.js can be installed privately under `~/.local/` with an official checksum-verified Node archive. Linux system packages are installed only after confirmation. See [`docs/INSTALLER.md`](docs/INSTALLER.md) for Windows PowerShell, custom locations, troubleshooting, and exactly what the installer changes.
+
+### Manual installation
 
 ```bash
 git clone https://github.com/bcain2121/furby-open.git
 cd furby-open
 bash scripts/bootstrap.sh
+npm run setup
 ```
 
-Configure identity in the newly created private `.env`, then run the secure Telegram helper:
-
-```env
-ASSISTANT_NAME=My Assistant
-ASSISTANT_OWNER_NAME=Alex
-ASSISTANT_TIMEZONE=America/New_York
-ASSISTANT_LOCATION=Brooklyn, NY
-```
-
-```bash
-npm run setup:telegram
-```
-
-The helper walks through BotFather, hides and verifies the token, discovers the owner's numeric user ID after they send `/start`, and writes credentials directly to ignored `.env`.
-
-Authenticate a model:
-
-```bash
-npx pi
-# Enter /login in Pi, then exit when authentication is complete.
-```
-
-Validate and run:
-
-```bash
-npm run doctor
-npm run build
-npm test
-npm start
-```
-
-See [`docs/SETUP.md`](docs/SETUP.md) for the complete walkthrough.
+The shared `npm run setup` wizard handles private personality, Telegram, Pi authentication guidance, and validation on macOS, Windows, and Linux. See [`docs/SETUP.md`](docs/SETUP.md) for the complete manual walkthrough.
 
 ### Install with a coding agent
 

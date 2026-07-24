@@ -19,6 +19,10 @@ The current Pi SDK npm package ships its own shrinkwrapped dependency tree. At t
 
 Neither parser is intentionally exposed directly to untrusted Telegram input by Furby Open, but the advisories remain open until an upstream Pi package refreshes its shrinkwrap. CI reports all advisories and blocks critical-severity findings. Dependabot monitors updates.
 
+## Installer trust
+
+Download installers only from this repository's tagged releases. The macOS/Linux installer pins the application checkout to a release tag and verifies fallback Node.js archives against Node's official SHA-256 manifest. Windows prerequisite installs use explicit Windows Package Manager IDs. Download-first commands in `docs/INSTALLER.md` let you inspect scripts before running them. The installer never disables Gatekeeper, changes PowerShell's permanent execution policy, starts the bot automatically, or asks for credentials outside provider-owned flows and hidden local prompts.
+
 ## Trust model
 
 Furby Open is designed for one trusted operator on one computer.

@@ -6,6 +6,10 @@ Furby Open is intentionally a small application around Pi rather than a replacem
 
 ## Components
 
+### Guided installation
+
+`install.sh` and `install.ps1` handle platform prerequisites and pinned application checkout. The `.command` and `.cmd` files are thin double-click terminal launchers. After npm installation, every platform delegates identity, personality, Telegram, Pi login guidance, and validation to `src/scripts/setup.ts`; credential entry remains in the dedicated hidden-input Telegram helper or provider-owned Pi flow.
+
 ### Telegram transport
 
 `src/bot/` authenticates one configured Telegram user, receives text and media, batches rapid messages, formats model output, and returns replies. Transport concerns are kept separate from runtime and storage.

@@ -2,6 +2,22 @@
 
 All notable changes to Furby Open will be documented here.
 
+## [0.1.0-alpha.4] - 2026-07-21
+
+### Added
+
+- Cross-platform guided setup wizard for identity, private personality, Telegram, Pi login guidance, and validation
+- Checksum-verified macOS/Linux terminal installer with optional dependency installation
+- Windows PowerShell installer using explicit Windows Package Manager IDs
+- Double-click macOS `.command` and Windows `.cmd` launchers
+- Detailed installer, resume, troubleshooting, and uninstall documentation
+
+### Changed
+
+- FFmpeg and Poppler are now correctly treated as optional feature dependencies for text-only installations
+- Doctor command detection now works natively on Windows
+- Manual bootstrap now installs locked dependencies with `npm ci`
+
 ## [0.1.0-alpha.3] - 2026-07-14
 
 ### Added

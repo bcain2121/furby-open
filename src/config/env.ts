@@ -9,6 +9,7 @@ const rootDir = process.env.FURBY_OPEN_ROOT_DIR
   ? path.resolve(process.env.FURBY_OPEN_ROOT_DIR)
   : path.resolve(moduleDir, '..', '..');
 const envPath = path.join(rootDir, '.env');
+const userHome = process.env.HOME || process.env.USERPROFILE || '';
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
 else dotenv.config();
 
@@ -76,7 +77,7 @@ export const config = {
   googleApiKey: parsed.GOOGLE_GENERATIVE_AI_API_KEY ?? '',
   openrouterApiKey: parsed.OPENROUTER_API_KEY ?? '',
   piAuthPath: parsed.PI_AUTH_PATH || undefined,
-  piAgentDir: parsed.PI_AGENT_DIR || path.join(process.env.HOME ?? '', '.pi', 'agent'),
+  piAgentDir: parsed.PI_AGENT_DIR || path.join(userHome, '.pi', 'agent'),
   piModelsPath: parsed.PI_MODELS_PATH || undefined,
   piThinkingLevel: parsed.PI_THINKING_LEVEL,
   piPromptTimeoutSeconds: parsed.PI_PROMPT_TIMEOUT_SECONDS,

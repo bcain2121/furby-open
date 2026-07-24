@@ -4,6 +4,8 @@ This runbook is for Codex CLI, Claude Code, Pi, or another coding agent with ter
 
 ## Instructions for the installation agent
 
+First offer the owner the platform installer in [`INSTALLER.md`](INSTALLER.md). It is usually easier and uses the same security boundaries as this runbook. If they want agent-led installation, or the platform installer fails, continue below and diagnose rather than improvising around credential gates.
+
 ### Communication rules
 
 - Explain one stage at a time in plain language.
@@ -25,11 +27,17 @@ bash scripts/check-system-deps.sh
 bash scripts/bootstrap.sh
 ```
 
-4. Explain and fix required dependency failures. Optional Whisper and PM2 warnings may be deferred.
+4. Explain and fix required dependency failures. FFmpeg, Poppler, Whisper, and PM2 warnings may be deferred when the owner only needs text chat.
 
 ## Stage 2: choose the assistant's identity and personality
 
-Ask the owner, in conversational language:
+When a normal interactive terminal is available, prefer the shared wizard:
+
+```bash
+npm run setup
+```
+
+It continues through identity, Telegram, Pi guidance, and validation. The owner may safely rerun it after an interruption. If the agent must perform the non-secret identity stage manually, ask the owner in conversational language:
 
 1. What should the assistant be called?
 2. What name should it use for the owner?
@@ -88,7 +96,7 @@ Inside Pi, guide the owner to:
 3. Complete the browser, device-code, or API-key flow themselves.
 4. Return to Pi after it reports success.
 5. Type `/model`, select an available model, and confirm it appears active.
-6. Exit Pi after authentication is complete.
+6. Type `/quit` to return to the installer after authentication is complete.
 
 The agent may launch the TUI and describe the next action, but must not operate the owner's provider account, request OAuth codes in chat, or inspect `~/.pi/agent/auth.json`.
 

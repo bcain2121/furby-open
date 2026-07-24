@@ -1,6 +1,6 @@
 {
   "name": "furby-open",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "private": true,
   "description": "A minimal, self-hosted Telegram personal AI agent powered by the Pi SDK.",
   "type": "module",
@@ -12,6 +12,7 @@
     "test": "node --import tsx/esm --test tests/*.test.ts",
     "test:coverage": "node --experimental-test-coverage --import tsx/esm --test tests/*.test.ts",
     "check:public": "bash scripts/check-public-safety.sh",
+    "setup": "node --import tsx/esm src/scripts/setup.ts",
     "setup:telegram": "node --import tsx/esm src/scripts/setup-telegram.ts",
     "verify:telegram": "node --import tsx/esm src/scripts/setup-telegram.ts --verify",
     "update:check": "bash scripts/update.sh --check",
@@ -19,7 +20,8 @@
     "smoke:pi": "node --import tsx/esm src/scripts/smoke-pi.ts",
     "doctor": "node --import tsx/esm src/scripts/doctor.ts",
     "cleanup": "node --import tsx/esm src/scripts/cleanup.ts",
-    "cleanup:apply": "node --import tsx/esm src/scripts/cleanup.ts --apply"
+    "cleanup:apply": "node --import tsx/esm src/scripts/cleanup.ts --apply",
+    "release:installers": "bash scripts/package-installers.sh"
   },
   "engines": {
     "node": ">=22.19.0"

@@ -5,7 +5,7 @@ description: Personalizes a Furby Open installation without exposing private dat
 
 # Assistant Customizer
 
-Customize the current Furby Open checkout while preserving privacy and upgradeability.
+Customize the current Furby Open checkout while preserving privacy and upgradeability. For ordinary first-run or owner-led changes, prefer the cross-platform `npm run setup` interview; use the manual workflow below for specialized requests.
 
 ## Workflow
 
