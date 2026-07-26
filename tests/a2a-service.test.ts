@@ -31,7 +31,6 @@ function options(taskDir: string) {
     taskDir,
     userId: 123,
     modelName: 'test/model',
-    toolMode: 'coding' as const,
     maxConcurrency: 2,
     agentName: 'Test Furby',
     skills: ['a2a'],
@@ -60,7 +59,7 @@ test('A2A service has one listener and completes standard JSON-RPC tasks in an i
   const card = await fetch(baseUrl).then((response) => response.json()) as any;
   assert.equal(card.name, 'Test Furby');
   assert.ok(card.capabilities.skills.includes('a2a'));
-  assert.ok(card.capabilities.tools.includes('write_a2a_response'));
+  assert.deepEqual(card.capabilities.tools, ['write_a2a_response', 'list_a2a_pending']);
 
   const sent = await fetch(baseUrl, {
     method: 'POST',
@@ -75,6 +74,7 @@ test('A2A service has one listener and completes standard JSON-RPC tasks in an i
   assert.equal(completed.status, 'completed');
   assert.equal(completed.result, 'network answer');
   assert.equal(calls.length, 1);
+  assert.equal(calls[0][3], 'safe');
   assert.equal(calls[0][5], 'a2a');
   assert.match(calls[0][1], /\[A2A:standard-task-1\]/u);
 

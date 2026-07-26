@@ -34,8 +34,22 @@ test('assistant response extraction never returns text from before the current p
   assert.equal(extractAssistantTextSince(messages, 2), 'new answer');
 });
 
-test('public defaults use safe mode and disable A2A', () => {
+test('public defaults use confined safe mode and disable A2A', () => {
   const envSource = fs.readFileSync(path.join(rootDir, 'src', 'config', 'env.ts'), 'utf8');
+  const capabilityPolicy = fs.readFileSync(path.join(rootDir, 'src', 'runtime', 'capability-policy.ts'), 'utf8');
   assert.match(envSource, /FURBY_OPEN_TOOL_MODE:[\s\S]*default\('safe'\)/u);
   assert.match(envSource, /FURBY_OPEN_A2A_ENABLED[\s\S]*\? false/u);
+  assert.match(capabilityPolicy, /safe: \[\]/u);
+});
+
+test('Pi smoke test preserves a failing exit status', () => {
+  const source = fs.readFileSync(path.join(rootDir, 'src', 'scripts', 'smoke-pi.ts'), 'utf8');
+  assert.match(source, /process\.exitCode = 1/u);
+  assert.doesNotMatch(source, /process\.exit\(0\)/u);
+});
+
+test('Telegram transport does not block polling while an interactive model run is active', () => {
+  const source = fs.readFileSync(path.join(rootDir, 'src', 'bot', 'telegram.ts'), 'utf8');
+  assert.match(source, /function startInteractive/u);
+  assert.doesNotMatch(source, /await submitInteractive\(/u);
 });

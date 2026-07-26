@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { config } from '../config/env.js';
-import { appUserIdForTelegram, openDatabase } from '../db/database.js';
+import { ensureTelegramUser, openDatabase } from '../db/database.js';
 import { insertMediaAsset, lightweightPreview, sha256Buffer, writeVaultFile, type SavedMediaAsset } from '../db/media.js';
 
 const MAX_TELEGRAM_DOWNLOAD_BYTES = 25 * 1024 * 1024;
@@ -70,8 +70,9 @@ export async function saveTelegramMedia(input: {
 
   const db = openDatabase();
   try {
+    const userId = ensureTelegramUser(db, input.telegramUserId, config.ownerName);
     const id = insertMediaAsset(db, {
-      userId: appUserIdForTelegram(input.telegramUserId),
+      userId,
       sourceId,
       originalFilename,
       vaultPath: written.vaultPath,

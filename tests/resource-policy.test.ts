@@ -44,8 +44,7 @@ test('A2A response tools exist only in A2A sessions and Telegram sends are exclu
   const names = (purpose: 'interactive' | 'scheduled' | 'a2a') => (
     createFurbyCustomTools(123, purpose).map((tool: any) => String(tool.name))
   );
-  assert.ok(names('a2a').includes('write_a2a_response'));
-  assert.ok(names('a2a').includes('list_a2a_pending'));
+  assert.deepEqual(names('a2a'), ['write_a2a_response', 'list_a2a_pending']);
   assert.ok(!names('interactive').includes('write_a2a_response'));
   assert.ok(!names('scheduled').includes('write_a2a_response'));
   assert.ok(!names('a2a').some((name) => name.includes('telegram')));

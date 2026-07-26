@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { config } from '../config/env.js';
+import { config, validateRuntimeConfig } from '../config/env.js';
 import { defaultDbPath, openDatabase } from '../db/database.js';
 import { detectExternalAgents, discoverExternalSkills, externalSkillSources } from '../skills/external-skill-importer.js';
 
@@ -34,6 +34,10 @@ function checkWritableDir(dir: string, label: string) {
 }
 
 console.log(`${config.name} doctor\n`);
+
+for (const issue of validateRuntimeConfig()) {
+  if (!issue.startsWith('TELEGRAM_')) fail(issue);
+}
 
 if (fs.existsSync(path.join(config.rootDir, '.env'))) pass('.env exists');
 else warn('.env missing; copy .env.example to .env');

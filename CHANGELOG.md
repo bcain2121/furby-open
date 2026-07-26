@@ -2,6 +2,25 @@
 
 All notable changes to Furby Open will be documented here.
 
+## Unreleased
+
+### Added
+
+- File-by-file project map in `tree.md` and prioritized maturity roadmap
+- Runtime policy tests for timezone and loopback-only A2A configuration
+
+### Fixed
+
+- Telegram polling no longer waits for an active model response, allowing rapid-message batching and steering to work in production
+- Owner records are ensured before media or memory writes, preventing first-use foreign-key failures
+- Scheduled task times now use the configured assistant timezone instead of a hardcoded timezone
+- Pi smoke tests now return a failing exit status when the model invocation fails
+
+### Security
+
+- Safe mode no longer exposes Pi's broad filesystem read tool
+- A2A is forced to safe mode, limited to task-response tools, and rejected on non-loopback hostnames
+
 ## [0.1.0-alpha.4] - 2026-07-21
 
 ### Added

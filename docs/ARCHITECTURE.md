@@ -26,11 +26,11 @@ The runtime loads project-local Pi skills but not global extension lifecycles. G
 
 ### Capability policy
 
-Safe mode uses an explicit allowlist. Coding mode enables Pi's `read`, `bash`, `edit`, and `write` tools plus all assistant tools. Mode changes reset the interactive session so the active tool set is truthful.
+Safe mode uses an explicit allowlist of read-only assistant tools confined to assistant data and the configured workspace; Pi's broad filesystem `read` tool is not exposed. Coding mode enables Pi's `read`, `bash`, `edit`, and `write` tools plus all assistant tools. Mode changes reset the interactive session so the active tool set is truthful.
 
 ### SQLite
 
-SQLite stores users, memory, media metadata, scheduled tasks, task runs, and preferences. Migrations are versioned and run when the database opens. Conversation continuity itself remains in Pi session files.
+SQLite stores users, memory, media metadata, scheduled tasks, task runs, and preferences. Migrations are versioned and run when the database opens. Conversation/FTS tables exist for a future opt-in journal, but ordinary runtime exchanges are not yet written to them. Conversation continuity currently remains in Pi session files.
 
 ### Workspace
 
@@ -42,7 +42,21 @@ The scheduler claims due work with leases before execution, uses a separate Pi s
 
 ### A2A
 
-The optional A2A service exposes JSON-RPC task submission, polling, and streaming on localhost. It is disabled by default and currently unauthenticated.
+The optional A2A service exposes JSON-RPC task submission, polling, and streaming on localhost. It is disabled by default and currently unauthenticated. Runtime validation refuses non-loopback binding, A2A sessions are forced to safe mode, and they receive only the two task-response tools rather than Telegram, database, memory, or workspace tools.
+
+## Request flow
+
+```text
+Telegram update
+  -> single-user middleware
+  -> command handler OR interactive message broker
+  -> purpose-isolated Pi runtime session
+  -> capability policy + project resource policy
+  -> model and approved tools
+  -> chunked/retried Telegram delivery
+```
+
+The scheduler and A2A listener enter at the Pi runtime with separate session purposes. SQLite modules provide assistant state; Pi session files provide conversational continuity; the workspace holds user-facing files. See [`../tree.md`](../tree.md) for every tracked file and its connections.
 
 ## Data boundaries
 

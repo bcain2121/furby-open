@@ -1,7 +1,7 @@
 export type ToolMode = 'safe' | 'coding';
 
 const BUILT_IN_TOOLS: Record<ToolMode, readonly string[]> = {
-  safe: ['read'],
+  safe: [],
   coding: ['read', 'bash', 'edit', 'write'],
 };
 
@@ -32,7 +32,7 @@ export function effectiveToolNames(mode: ToolMode, registeredCustomToolNames: re
 
 export function securityModeSummary(mode: ToolMode) {
   if (mode === 'safe') {
-    return 'read-only Pi access plus approved read-only Furby tools; file writes, memory writes, schedule changes, media generation, and Telegram sends are disabled';
+    return 'approved read-only Furby tools confined to assistant data and the configured workspace; broad filesystem reads, file writes, memory writes, schedule changes, media generation, Telegram sends, and shell commands are disabled';
   }
   return 'read/bash/edit/write Pi access plus all registered Furby tools';
 }

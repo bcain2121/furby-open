@@ -13,7 +13,9 @@ try {
   );
   console.log('\n[smoke] response:');
   console.log(response.text);
+} catch (error) {
+  console.error(`[smoke] failed: ${error instanceof Error ? error.message : String(error)}`);
+  process.exitCode = 1;
 } finally {
   runtime.dispose();
-  process.exit(0);
 }

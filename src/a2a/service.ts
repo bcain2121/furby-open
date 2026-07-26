@@ -1,7 +1,7 @@
 import http from 'node:http';
 import { randomUUID } from 'node:crypto';
 import type { AddressInfo } from 'node:net';
-import { A2ATaskStore, type A2ATask, isValidA2ATaskId } from './store.js';
+import { A2ATaskStore, isValidA2ATaskId } from './store.js';
 
 interface A2ARuntime {
   prompt(
@@ -21,7 +21,6 @@ export interface FurbyA2AServiceOptions {
   taskDir: string;
   userId: number;
   modelName: string;
-  toolMode: 'safe' | 'coding';
   maxConcurrency: number;
   agentName: string;
   skills?: string[];
@@ -240,7 +239,7 @@ export class FurbyA2AService {
         this.options.userId,
         `[A2A:${taskId}]\n\n${message}\n\n[/A2A:${taskId}]\n\nRespond to this network agent request. Use write_a2a_response with taskId ${taskId} for the final answer.`,
         this.options.modelName,
-        this.options.toolMode,
+        'safe',
         [],
         'a2a',
       );
@@ -283,7 +282,7 @@ export class FurbyA2AService {
       capabilities: {
         streaming: true,
         pushNotifications: false,
-        tools: ['read', 'bash', 'edit', 'write', 'write_a2a_response', 'list_a2a_pending'],
+        tools: ['write_a2a_response', 'list_a2a_pending'],
         skills: this.options.skills ?? [],
       },
     };

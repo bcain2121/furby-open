@@ -45,7 +45,7 @@ export function createScheduleTools(telegramUserId: number) {
             runAt,
             nextRunAt,
           });
-          return textResult(`Scheduled task ${id} for ${formatTaskTime(nextRunAt.toISOString())}.`, { id });
+          return textResult(`Scheduled task ${id} for ${formatTaskTime(nextRunAt.toISOString(), config.assistantTimezone)}.`, { id });
         } finally {
           db.close();
         }

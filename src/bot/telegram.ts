@@ -138,6 +138,15 @@ export function createTelegramBot(runtime: FurbyPiRuntime, preferences: Preferen
     }
   }
 
+  function startInteractive(ctx: any, message: InteractiveMessage) {
+    void submitInteractive(ctx, message).catch(async (error) => {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logTelegramRuntime('interactive_submission.failed', telegramErrorDetails(error));
+      console.error('[telegram] interactive submission failed', error);
+      await ctx.reply(`❌ ${escapeHtml(errorMessage)}`, { parse_mode: 'HTML' }).catch(() => undefined);
+    });
+  }
+
   bot.on('message:text', async (ctx) => {
     const userId = ctx.from!.id;
     const text = ctx.message.text.trim();
@@ -154,7 +163,7 @@ export function createTelegramBot(runtime: FurbyPiRuntime, preferences: Preferen
       return;
     }
 
-    await submitInteractive(ctx, { text });
+    startInteractive(ctx, { text });
   });
 
   bot.on('message:photo', async (ctx) => {
@@ -171,7 +180,7 @@ export function createTelegramBot(runtime: FurbyPiRuntime, preferences: Preferen
         fallbackName: 'photo',
       });
       const caption = ctx.message.caption?.trim() || 'Please inspect this image.';
-      await submitInteractive(ctx, {
+      startInteractive(ctx, {
         text: `${caption}\n\n[Image saved to the configured workspace: ${asset.vaultPath}]`,
         images: [{ mediaType: asset.mimeType, data: fs.readFileSync(asset.absolutePath).toString('base64') }],
       });
@@ -229,7 +238,7 @@ export function createTelegramBot(runtime: FurbyPiRuntime, preferences: Preferen
       } finally {
         db.close();
       }
-      await submitInteractive(ctx, {
+      startInteractive(ctx, {
         text: `Voice message transcript (${transcript.provider}/${transcript.model}); audio saved to the configured workspace at ${asset.vaultPath}:\n\n${transcript.text}`,
       });
     } catch (error) {

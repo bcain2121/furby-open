@@ -64,15 +64,15 @@ export const FURBY_SESSION_SETTINGS = Object.freeze({
 });
 
 export function createFurbyCustomTools(userId: number, purpose: FurbyPromptPurpose) {
+  if (purpose === 'a2a') return createA2ATools();
   return [
     ...createInfoTools(),
     ...createMemoryTools(userId),
     ...createMediaTools(userId),
     ...createScheduleTools(userId),
     ...createVaultTools(),
-    ...(purpose === 'a2a' ? [] : createTelegramTools()),
+    ...createTelegramTools(),
     ...createDbTools(),
-    ...(purpose === 'a2a' ? createA2ATools() : []),
   ];
 }
 

@@ -13,7 +13,7 @@ Furby Open keeps the core understandable: one Telegram bot, one local SQLite dat
 - **Bring your own model:** use Pi-supported OAuth providers or API keys.
 - **Telegram-native:** talk to your assistant from a phone without hosting a web UI.
 - **Expandable:** add ordinary Pi skills under `.pi/skills/`; the assistant can help author them in opt-in coding mode.
-- **Safe public defaults:** read-only tool mode and no A2A listener until you enable them.
+- **Safe public defaults:** confined read-only assistant tools and no A2A listener until you enable it.
 
 ## Features
 
@@ -91,7 +91,7 @@ Furby Open starts in **safe mode**:
 FURBY_OPEN_TOOL_MODE=safe
 ```
 
-Safe mode exposes Pi's read tool plus explicitly approved read-only assistant tools. It cannot write files, save memory, change schedules, send files, or execute shell commands.
+Safe mode exposes only explicitly approved read-only assistant tools for assistant data and the configured workspace. It does not expose Pi's broad filesystem `read` tool and cannot write files, save memory, change schedules, send files, or execute shell commands.
 
 Coding mode is explicit opt-in:
 
@@ -165,7 +165,7 @@ flowchart LR
   A[Optional localhost A2A] --> R
 ```
 
-More detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+More detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For a file-by-file source map, see [`tree.md`](tree.md). The prioritized maturity plan is in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Private Data
 

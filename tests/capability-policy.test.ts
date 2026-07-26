@@ -28,10 +28,11 @@ const allCustomTools = [
 
 test('safe mode includes only explicitly approved read-only tools', () => {
   const effective = effectiveToolNames('safe', allCustomTools);
-  assert.deepEqual(effective.builtIn, ['read']);
+  assert.deepEqual(effective.builtIn, []);
   assert.deepEqual(effective.custom, allCustomTools.filter((name) => SAFE_CUSTOM_TOOL_NAMES.has(name)));
 
   for (const forbidden of [
+    'read',
     'bash',
     'edit',
     'write',

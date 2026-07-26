@@ -14,10 +14,10 @@ If you accidentally expose a credential, revoke or rotate it immediately. Removi
 
 The current Pi SDK npm package ships its own shrinkwrapped dependency tree. At the first alpha release, npm reports:
 
-- `brace-expansion` denial-of-service advisory through Pi's `minimatch`
-- `protobufjs` parser denial-of-service advisory through Pi's Google GenAI dependency
+- `brace-expansion` exponential-work and unbounded-expansion denial-of-service advisories through Pi's dependency tree
+- `protobufjs` parser infinite-loop denial-of-service advisory through Pi's Google GenAI dependency
 
-Neither parser is intentionally exposed directly to untrusted Telegram input by Furby Open, but the advisories remain open until an upstream Pi package refreshes its shrinkwrap. CI reports all advisories and blocks critical-severity findings. Dependabot monitors updates.
+Neither parser is intentionally exposed directly to untrusted Telegram input by Furby Open, but the advisories remain open until upstream packages refresh their dependency trees. A 2026-07-24 review of Pi `0.82.1` shows that it removes the current `protobufjs` finding but still carries a high-severity `brace-expansion` finding. CI reports all advisories and blocks critical-severity findings. Dependabot monitors updates.
 
 ## Installer trust
 
@@ -35,7 +35,7 @@ Prefer `npm run setup:telegram` during installation. It accepts the token throug
 
 ### Safe mode
 
-The public default is `FURBY_OPEN_TOOL_MODE=safe`. It exposes only read-only capabilities selected by an explicit allowlist.
+The public default is `FURBY_OPEN_TOOL_MODE=safe`. It exposes only read-only assistant capabilities selected by an explicit allowlist and confined to assistant data or the configured workspace. Pi's broad filesystem `read` tool is deliberately absent in safe mode.
 
 ### Coding mode
 
@@ -61,7 +61,7 @@ Use `scripts/update.sh` rather than an unreviewed pull. It requires a clean sour
 
 ### A2A
 
-The A2A endpoint is disabled by default. Its current protocol has no authentication. If enabled, keep `FURBY_OPEN_A2A_HOSTNAME=127.0.0.1` unless you have added an authenticated network boundary.
+The A2A endpoint is disabled by default. Its current protocol has no authentication, and runtime validation refuses non-loopback hostnames. A2A work is forced into safe mode with only task-response tools; it cannot use Telegram, database, memory, workspace, or coding tools. Do not proxy the listener to an untrusted network.
 
 ### Secrets and private data
 

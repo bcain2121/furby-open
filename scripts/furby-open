@@ -12,7 +12,7 @@ cd "$APP_DIR"
 
 if [[ ! -d node_modules ]]; then
   echo "Installing dependencies..."
-  npm install
+  npm ci
 fi
 
 exec npm start -- "$@"

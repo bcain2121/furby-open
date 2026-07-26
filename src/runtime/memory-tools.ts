@@ -1,5 +1,5 @@
 import { defineTool } from '@earendil-works/pi-coding-agent';
-import { appUserIdForTelegram, openDatabase } from '../db/database.js';
+import { appUserIdForTelegram, ensureTelegramUser, openDatabase } from '../db/database.js';
 import { saveMemory, searchConversationMessages, searchMemories } from '../db/memory.js';
 
 function textResult(text: string, details: Record<string, unknown> = {}) {
@@ -26,6 +26,7 @@ export function createMemoryTools(telegramUserId: number) {
       execute: async (_toolCallId: string, params: any) => {
         const db = openDatabase();
         try {
+          ensureTelegramUser(db, telegramUserId);
           const id = saveMemory(db, {
             userId,
             content: String(params.content ?? ''),

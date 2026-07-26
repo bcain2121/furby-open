@@ -91,9 +91,9 @@ export function formatScheduleHelp() {
   ].join('\n');
 }
 
-export function formatTaskTime(iso: string) {
+export function formatTaskTime(iso: string, timeZone = 'UTC') {
   return new Date(iso).toLocaleString('en-US', {
-    timeZone: 'America/Los_Angeles',
+    timeZone,
     dateStyle: 'short',
     timeStyle: 'short',
   });

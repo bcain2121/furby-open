@@ -279,7 +279,7 @@ export function createTelegramCommandHandler(runtime: FurbyPiRuntime, preference
             '',
             ...tasks.map((task, index) => [
               `${index + 1}. ${code(task.id.slice(0, 8))} ${task.enabled ? '✅' : '⏸️'} ${escapeHtml(task.title ?? task.prompt).slice(0, 120)}`,
-              `   Next: ${escapeHtml(formatTaskTime(task.next_run_at))} | Runs: ${task.run_count} | ${escapeHtml(task.schedule_kind)}`,
+              `   Next: ${escapeHtml(formatTaskTime(task.next_run_at, config.assistantTimezone))} | Runs: ${task.run_count} | ${escapeHtml(task.schedule_kind)}`,
             ].join('\n')),
           ].join('\n'));
           return;
@@ -320,7 +320,7 @@ export function createTelegramCommandHandler(runtime: FurbyPiRuntime, preference
         await reply([
           '✅ Scheduled.',
           `ID: ${code(id.slice(0, 8))}`,
-          `Next: ${escapeHtml(formatTaskTime(spec.nextRunAt.toISOString()))}`,
+          `Next: ${escapeHtml(formatTaskTime(spec.nextRunAt.toISOString(), config.assistantTimezone))}`,
           `Prompt: ${escapeHtml(spec.prompt)}`,
         ].join('\n'));
       } finally {

@@ -96,9 +96,28 @@ export const config = {
   whisperCppModel: parsed.WHISPER_CPP_MODEL || path.join(rootDir, '.data', 'local', 'whisper.cpp', 'models', 'ggml-tiny.en.bin'),
 };
 
+export function isValidTimeZone(timeZone: string) {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function isLoopbackHostname(hostname: string) {
+  return ['127.0.0.1', '::1', 'localhost'].includes(hostname.toLowerCase());
+}
+
 export function validateRuntimeConfig() {
   const issues: string[] = [];
   if (!config.telegramBotToken) issues.push('TELEGRAM_BOT_TOKEN is required.');
   if (!config.telegramUserId) issues.push('TELEGRAM_USER_ID must be a numeric Telegram user id.');
+  if (!isValidTimeZone(config.assistantTimezone)) {
+    issues.push('ASSISTANT_TIMEZONE must be a valid IANA timezone such as UTC or America/New_York.');
+  }
+  if (config.a2aEnabled && !isLoopbackHostname(config.a2aHostname)) {
+    issues.push('FURBY_OPEN_A2A_HOSTNAME must remain loopback-only because the A2A protocol is unauthenticated.');
+  }
   return issues;
 }
