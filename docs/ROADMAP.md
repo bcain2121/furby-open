@@ -20,7 +20,7 @@ The project is not yet a polished general-public product. Its biggest gaps are o
 ## P1 — security and operations
 
 1. **Authenticate A2A before network expansion.** A2A is now disabled by default, forced to loopback, forced to safe mode, and limited to response tools. Add a real token or mutually authenticated transport before supporting reverse proxies or non-loopback use.
-2. **Separate unattended automation permissions.** Scheduled tasks currently inherit the owner's selected tool mode. Introduce an explicit per-task capability choice so switching an interactive session to coding mode does not silently give recurring tasks broad shell/filesystem power.
+2. **Replace safe/coding modes with explicit access scope.** Follow [`../plan.md`](../plan.md): keep the assistant fully capable, confine file tools to the project by default, require a temporary owner-confirmed grant for unrestricted host tools, and ensure scheduled tasks never inherit interactive outside access.
 3. **Add release provenance.** Generate checksums automatically in a release workflow, attach an SBOM, sign tags/assets where practical, and publish the exact commit and dependency audit with each release.
 4. **Harden optional source downloads.** Pin `whisper.cpp` to a reviewed tag or commit and verify downloaded model artifacts. The current optional installer follows the upstream default branch.
 5. **Add network timeouts and size policy everywhere.** Telegram setup has a timeout, but weather, media download, file send, and OpenAI transcription should share bounded timeout/retry helpers.

@@ -165,7 +165,7 @@ flowchart LR
   A[Optional localhost A2A] --> R
 ```
 
-More detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For a file-by-file source map, see [`tree.md`](tree.md). The prioritized maturity plan is in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+More detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For a file-by-file source map, see [`tree.md`](tree.md). The prioritized maturity plan is in [`docs/ROADMAP.md`](docs/ROADMAP.md). The proposed replacement of safe/coding modes with project/outside access scopes is specified in [`plan.md`](plan.md); it is not implemented yet.
 
 ## Private Data
 

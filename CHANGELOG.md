@@ -6,7 +6,7 @@ All notable changes to Furby Open will be documented here.
 
 ### Added
 
-- File-by-file project map in `tree.md` and prioritized maturity roadmap
+- File-by-file project map in `tree.md`, prioritized maturity roadmap, and detailed single access-scope migration plan
 - Runtime policy tests for timezone and loopback-only A2A configuration
 
 ### Fixed
