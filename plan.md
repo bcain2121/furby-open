@@ -102,16 +102,14 @@ Scheduled tasks use the owner's current persisted scope. In `project` scope they
 
 A2A remains a purpose-specific restricted runtime with only `write_a2a_response` and `list_a2a_pending`, regardless of the owner's persisted scope. This is protocol isolation, not a user-selectable safe/coding mode. A2A stays disabled by default, loopback-only, and unable to elevate access.
 
-## 4. Sensitive paths in project scope
+## 4. Project-internal path policy
 
-The project root contains both public source and private runtime data. Project confinement alone is not enough to prevent accidental credential or database damage.
+The project root contains both public source and private runtime data. Project scope intentionally allows Furby to read and update its own configuration, including `.env` and related environment files. This means the active model may receive secrets if it chooses to read those files, so the system prompt must continue to prohibit unnecessary secret access, disclosure, logging, or transmission.
 
 Recommended project-scope policy:
 
 ### Read and write denied
 
-- `.env`
-- `.env.*` except the public `.env.example`
 - `.data/furby-open.db` and SQLite sidecar files
 - `.data/backups/`
 - backup archives
@@ -126,12 +124,13 @@ Recommended project-scope policy:
 
 ### Read and write allowed
 
+- `.env`, `.env.*`, and `.env.example`
 - Public source and documentation
 - Tests
 - Project-local starter/imported skill files, subject to existing skill rules
 - `furby-open-workspace/`
-- `.data/personality.md` through the intended customization workflow
-- Other explicitly supported local configuration files
+- `.data/personality.md`, including through general project file tools
+- Other project-local configuration files
 
 The final implementation should centralize this policy rather than scatter filename checks across tools.
 
@@ -236,7 +235,7 @@ Use Pi's pluggable `ReadOperations`, `EditOperations`, and `WriteOperations` rat
 2. Reject any path outside the root.
 3. Find the nearest existing ancestor and resolve its real path.
 4. Reject ancestor or target symlink escapes.
-5. Apply sensitive-path policy.
+5. Apply the project-internal path policy while explicitly allowing environment/configuration files.
 6. Recheck immediately before each read, write, mkdir, or edit operation.
 7. Preserve existing file permissions where applicable.
 8. Apply bounded file sizes to avoid accidental memory exhaustion.
@@ -261,7 +260,8 @@ All are bypassable. Host Bash belongs only to confirmed outside scope until a re
 - Project paths are accepted.
 - Parent traversal and outside absolute paths are rejected.
 - Existing and nearest-ancestor symlink escapes are rejected.
-- Sensitive paths are denied according to read/write policy.
+- Environment files can be read and written inside project scope.
+- SQLite, backup, key, certificate, and Git-internal restrictions follow the project-internal path policy.
 - Project scope returns confined file tools and every expected Furby tool.
 - Outside scope returns unrestricted Pi coding tools and every expected Furby tool.
 - Scheduled work uses the owner's persisted project/outside scope.
@@ -292,7 +292,8 @@ All are bypassable. Host Bash belongs only to confirmed outside scope until a re
 - Confined read/edit/write work on real temporary project files.
 - Attempts against an external temporary directory fail.
 - A symlink swapped or introduced between validation and operation is rejected where the OS permits the test.
-- `.env` and SQLite files remain protected.
+- `.env` and related environment files can be read and written.
+- SQLite database files and other explicitly denied internal paths remain protected.
 - Outside adapters are used only when persisted scope is outside.
 
 ### Runtime tests
@@ -321,7 +322,7 @@ Update together with implementation:
 
 - `README.md` — replace security modes with access scopes and show `/access` commands.
 - `.env.example` — remove `FURBY_OPEN_TOOL_MODE` after the compatibility period.
-- `SECURITY.md` — explain project confinement, persistent outside access, shell limitations, scheduled-task implications, and sensitive-path exclusions.
+- `SECURITY.md` — explain project confinement, project-scope access to `.env`, persistent outside access, shell limitations, scheduled-task implications, and remaining path exclusions.
 - `docs/ARCHITECTURE.md` — replace capability mode with access policy and persistent scope lifecycle.
 - `docs/SETUP.md` — explain the always-capable assistant and default project scope.
 - `docs/CUSTOMIZATION.md` — replace `/security` guidance.
@@ -337,7 +338,7 @@ Update together with implementation:
 ### Phase 1 — policy foundation
 
 1. Add `AccessScope` and purpose-specific policy.
-2. Add project path and sensitive-file checks.
+2. Add project path checks and the project-internal allow/deny policy, including explicit `.env` read/write access.
 3. Build confined file adapters.
 4. Add focused unit/integration tests.
 
@@ -383,7 +384,7 @@ The change is complete only when:
 - No owner-facing safe/coding mode remains.
 - All ordinary Furby custom capabilities work in project scope.
 - Project `read`, `edit`, and `write` cannot escape the canonical Furby root.
-- Sensitive private runtime files receive explicit protection.
+- Environment and related configuration files are readable/writable in project scope, while active databases, backups, private keys, and Git internals retain explicit protection.
 - Host Bash is absent in project scope.
 - Outside access requires a user-specific, short-lived confirmation.
 - Outside scope persists across sessions, resets, updates, and restarts until manually revoked.
@@ -397,13 +398,12 @@ The change is complete only when:
 
 Recommended defaults are shown in bold:
 
-1. Should project scope block reading `.env` as well as writing it? **Yes.**
-2. Should `.data/personality.md` remain writable through general file tools or only the customization workflow? **Customization workflow only.**
-3. Should dependency changes require outside access even though files are in the project? **File edits may occur in project scope, but package installation requires outside/Bash access.**
-4. Should `/access project` and `/access revoke` be aliases? **Yes.**
-5. Should persistent outside scope apply to scheduled tasks? **Yes; outside means outside until the owner changes it, and the confirmation must warn about unattended tasks.**
-6. Should real sandboxed project Bash be required for the first release of this design? **No; ship confined file tools first and add sandboxed shell separately.**
+1. Should `.data/personality.md` remain writable through general project file tools? **Yes.**
+2. Should dependency changes require outside access even though files are in the project? **File edits may occur in project scope, but package installation requires outside/Bash access.**
+3. Should `/access project` and `/access revoke` be aliases? **Yes.**
+4. Should persistent outside scope apply to scheduled tasks? **Yes; outside means outside until the owner changes it, and the confirmation must warn about unattended tasks.**
+5. Should real sandboxed project Bash be required for the first release of this design? **No; ship confined file tools first and add sandboxed shell separately.**
 
 ## 14. Recommended decision
 
-Implement one always-capable assistant with **project scope by default**, confined project file tools, no host Bash in project scope, and **persistent outside scope** protected by a one-time confirmation challenge. Outside remains active across restarts until `/access project` or `/access revoke`; scheduled work follows that persisted scope, while A2A remains task-only. Treat a real project shell as a later OS-sandbox feature.
+Implement one always-capable assistant with **project scope by default**, confined project file tools that may read and write `.env` and related configuration, no host Bash in project scope, and **persistent outside scope** protected by a one-time confirmation challenge. Outside remains active across restarts until `/access project` or `/access revoke`; scheduled work follows that persisted scope, while A2A remains task-only. Treat a real project shell as a later OS-sandbox feature.
