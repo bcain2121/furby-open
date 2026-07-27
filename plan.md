@@ -1,8 +1,16 @@
 # Single access-scope implementation plan
 
-**Status:** Proposed; not yet implemented
+**Status:** Approved implementation plan; not yet implemented
 
 **Purpose:** Replace Furby Open's safe/coding modes with one always-capable assistant whose filesystem reach is confined by default and explicitly expandable by the authorized owner until they change it back.
+
+## 0. Release checkpoint before implementation
+
+1. Preserve any private companion installation as a separate project; do not read its private runtime data into this repository or modify that checkout.
+2. Finish and publish the current Furby Open installer/reliability baseline before introducing the breaking access migration.
+3. Move the current `Unreleased` changelog entries into the baseline release notes, run Linux/macOS/Windows CI, attach installer bundles/checksums, and tag the exact validated commit.
+4. Start the access-scope work as `v0.2.0-alpha.1` because it changes commands, persisted preferences, tool assembly, configuration, and security semantics.
+5. Keep the source tree clean and use focused commits for policy, adapters, runtime wiring, commands/migration, and documentation.
 
 ## 1. Desired owner experience
 
@@ -16,7 +24,7 @@ The only user-facing security choice should be **where Furby may operate**:
 /project    Return to project-confined access
 ```
 
-Proposed behavior:
+Required behavior:
 
 - A new installation starts in `project` scope.
 - `project` scope remains active indefinitely unless the owner explicitly changes it.
@@ -117,13 +125,12 @@ Recommended project-scope policy:
 
 ### Read allowed but write denied
 
-- `package-lock.json` unless the owner explicitly asks for a dependency change
-- installer release checksums
 - `.git/` internals should never be edited through file tools
 
 ### Read and write allowed
 
 - `.env`, `.env.*`, and `.env.example`
+- `package.json`, `package-lock.json`, and installer release checksums
 - Public source and documentation
 - Tests
 - Project-local starter/imported skill files, subject to existing skill rules
@@ -156,12 +163,12 @@ The final implementation should centralize this policy rather than scatter filen
 Security properties:
 
 - Only native Telegram command handling for the authorized owner can change scope.
-- Unknown commands must not be forwarded to Pi when they begin with `/access`.
+- `/access`, `/outside`, and `/project` are always handled natively and are never forwarded to Pi, including malformed variants.
 - The model receives no access-elevation or access-revocation tool.
 - The `project` or `outside` scope is stored in SQLite preferences so it survives restart.
 - Logs may record scope changes and correlation IDs but not private command context.
 
-## 6. Proposed modules
+## 6. Planned modules
 
 ### `src/runtime/access-policy.ts`
 
@@ -202,7 +209,7 @@ Change session records from `toolMode` to `accessScope`. Session identity should
 
 ### `src/bot/commands.ts`
 
-Replace `/security safe|coding` with the native `/access` command family. Keep a temporary compatibility response for `/security` that explains the migration without changing access.
+Replace `/security safe|coding` with the native `/access`, `/outside`, and `/project` commands. Keep a temporary compatibility response for `/security` that explains the migration without changing access.
 
 ### `src/storage/preferences.ts`
 
@@ -273,7 +280,7 @@ All are bypassable. Host Bash belongs only to outside scope until a real sandbox
 
 - Outside transition immediately persists outside scope.
 - Restart/new access-control instance restores outside scope from preferences.
-- Project/revoke transitions are immediate, persisted, and idempotent.
+- Repeated `/project` transitions are immediate, persisted, and idempotent.
 - Scope changes return the correct session-reset instruction.
 - Outside activation returns the required warning and `/project` recovery instruction.
 - Only the authorized native command path can call scope-changing operations.
@@ -369,7 +376,7 @@ Update together with implementation:
 1. Update every document listed above.
 2. Run full validation and private-data scans.
 3. Test clean install and upgrade from the last tagged alpha.
-4. Publish as a clearly documented breaking alpha or beta migration.
+4. Publish as `v0.2.0-alpha.1` with a clearly documented migration from the baseline release.
 
 ### Phase 6 — optional real project shell
 
@@ -389,21 +396,24 @@ The change is complete only when:
 - Host Bash is absent in project scope.
 - `/outside` immediately activates without a confirmation challenge.
 - Its response prominently warns about host filesystem, shell, and scheduled-task access and explains `/project`.
-- Outside scope persists across sessions, resets, updates, and restarts until manually revoked.
+- Outside scope persists across sessions, resets, updates, and restarts until the owner sends `/project`.
 - Scheduled work follows persisted scope; A2A never inherits outside access.
 - Status output accurately reports persisted and active access.
 - Legacy configuration upgrades without startup failure.
 - Tests cover path escapes, symlinks, immediate scope changes, warnings, persistence, revocation, session reset, and purpose isolation.
 - Documentation never calls a cwd-only host shell “confined.”
 
-## 13. Open decisions before implementation
+## 13. Decisions locked for implementation
 
-Recommended defaults are shown in bold:
-
-1. Should `.data/personality.md` remain writable through general project file tools? **Yes.**
-2. Should dependency changes require outside access even though files are in the project? **File edits may occur in project scope, but package installation requires outside/Bash access.**
-3. Should persistent outside scope apply to scheduled tasks? **Yes; outside means outside until the owner changes it, and the activation response must warn about unattended tasks.**
-4. Should real sandboxed project Bash be required for the first release of this design? **No; ship confined file tools first and add sandboxed shell separately.**
+1. `.data/personality.md` is writable through general project file tools.
+2. `.env`, related environment files, package manifests, lockfiles, and other project configuration are readable and writable in project scope.
+3. Editing dependency files is allowed in project scope, but actually running package managers requires outside scope because project scope has no host Bash.
+4. `/outside` immediately persists outside scope with no challenge, timeout, or expiry.
+5. `/outside` always responds with a prominent warning and explicit `/project` recovery instructions.
+6. `/project` immediately persists project scope and resets stale unrestricted sessions.
+7. Persistent outside scope applies to scheduled tasks; the warning must mention unattended tasks.
+8. A2A stays independently restricted and cannot inherit or change owner scope.
+9. Real sandboxed project Bash is not required for this release; ship confined file tools first and add a genuine OS/container adapter separately.
 
 ## 14. Recommended decision
 

@@ -100,7 +100,7 @@ furby-open/
 - **`LICENSE`** — MIT license for the public source.
 - **`package-lock.json`** — Exact npm dependency graph used by `npm ci`, CI, installers, and updater validation.
 - **`package.json`** — Project identity, Node requirement, pinned Pi dependencies, runtime/development dependencies, and all npm command entry points.
-- **`plan.md`** — Proposed migration from safe/coding modes to one always-capable assistant with project-confined file tools and persistent owner-selected outside access with explicit recovery instructions.
+- **`plan.md`** — Approved migration plan from safe/coding modes to one always-capable assistant with project-confined file tools and persistent owner-selected outside access with explicit recovery instructions.
 - **`README.md`** — Main product explanation, quick install paths, security modes, extension model, updates, and links to detailed docs.
 - **`SECURITY.md`** — Threat model, reporting process, known upstream advisories, installer trust, capability modes, A2A restrictions, and secret-handling rules.
 - **`tree.md`** — This source map; complements `docs/ARCHITECTURE.md` with per-file ownership and interactions.
