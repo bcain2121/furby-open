@@ -11,18 +11,17 @@ Furby should not require the owner to think about “coding mode” versus “sa
 The only user-facing security choice should be **where Furby may operate**:
 
 ```text
-/access status     Show the current persistent scope
-/access project    Confine access to Furby Open
-/access outside    Confirm and persist unrestricted outside access
-/access revoke     Alias for /access project
+/access     Show the current persistent scope
+/outside    Immediately enable and persist unrestricted outside access
+/project    Return to project-confined access
 ```
 
 Proposed behavior:
 
 - A new installation starts in `project` scope.
 - `project` scope remains active indefinitely unless the owner explicitly changes it.
-- Confirmed `outside` scope persists across sessions, resets, updates, and process restarts.
-- Outside access remains active until the owner sends `/access project` or `/access revoke`.
+- `/outside` immediately enables and persists `outside` scope across sessions, resets, updates, and process restarts.
+- Outside access remains active until the owner sends `/project`.
 - A model, skill, scheduled task, A2A request, or tool call cannot grant or revoke outside access; only the authorized owner's native Telegram command can change the persisted scope.
 
 ## 2. Important security constraint
@@ -92,7 +91,7 @@ Available:
 - Unrestricted Pi `read`, `bash`, `edit`, and `write`
 - Every Furby custom tool above
 
-Outside scope is an owner-level persistent setting. It applies to interactive and scheduled work until the owner returns to project scope. The confirmation warning must state clearly that recurring tasks may use unrestricted host tools while outside scope is active.
+Outside scope is an owner-level persistent setting. It applies to interactive and scheduled work until the owner returns to project scope. The activation response must clearly warn that recurring tasks may use unrestricted host tools and show the `/project` recovery instruction.
 
 ### Scheduled work
 
@@ -134,30 +133,33 @@ Recommended project-scope policy:
 
 The final implementation should centralize this policy rather than scatter filename checks across tools.
 
-## 5. Elevation UX
+## 5. Access command UX
 
-`/access outside` should not elevate immediately. Proposed two-step flow:
+`/outside` elevates immediately without any additional confirmation or challenge:
 
-1. Owner sends `/access outside`.
-2. Furby explains that outside access can read, modify, or delete any OS-account-accessible file and run shell commands.
-3. Furby generates a short-lived confirmation challenge, for example:
+1. The authorized owner sends `/outside`.
+2. Furby persists `outside` scope in the owner's preferences.
+3. Furby disposes affected Pi sessions so stale project-confined tools cannot remain active.
+4. Furby replies with a prominent warning similar to:
 
    ```text
-   /access confirm 482731
+   ⚠️ Outside access is ON and persists across restarts.
+
+   Furby can now read, modify, or delete files available to this OS account and run host shell commands. Scheduled tasks also use outside access.
+
+   Return to confined project access at any time:
+   /project
    ```
 
-4. The challenge expires after 60 seconds and can be used once.
-5. Successful confirmation persists `outside` scope in the owner's preferences, resets affected Pi sessions, and reports that access remains unrestricted until manually revoked.
-6. `/access project` or `/access revoke` persists project scope, disposes unrestricted sessions, and creates fresh project-scoped sessions on the next request.
+5. `/project` immediately persists project scope, disposes unrestricted sessions, and reports that Furby is confined to its project again.
 
 Security properties:
 
-- Only native Telegram command handling can create a challenge or change scope.
+- Only native Telegram command handling for the authorized owner can change scope.
 - Unknown commands must not be forwarded to Pi when they begin with `/access`.
-- The model receives no access-elevation tool.
-- Challenges are keyed to the authorized Telegram user, remain in memory, expire quickly, and are never logged.
-- The resulting `project` or `outside` scope is stored in SQLite preferences so it survives restart.
-- Logs may record scope changes and correlation IDs, never confirmation codes.
+- The model receives no access-elevation or access-revocation tool.
+- The `project` or `outside` scope is stored in SQLite preferences so it survives restart.
+- Logs may record scope changes and correlation IDs but not private command context.
 
 ## 6. Proposed modules
 
@@ -178,12 +180,11 @@ Its interface should let callers ask what access applies without knowing filenam
 
 An access-control module that owns:
 
-- Pending in-memory confirmation challenges
-- One-time challenge validation and short challenge expiration
 - Reading and updating the owner's persisted scope
-- Project/outside transitions and revocation
-- Session-reset notifications after a scope change
-- Fake-clock support for deterministic challenge tests
+- Immediate project/outside transitions and revocation
+- Scope-change results used to reset stale sessions
+- Human-readable warning and recovery instructions
+- No timers, expiring grants, or confirmation challenges
 
 ### `src/runtime/project-file-tools.ts`
 
@@ -251,7 +252,7 @@ Do not implement “confined Bash” using any of these insufficient approaches:
 - changing `HOME`
 - maintaining a command allowlist while still permitting interpreters or package scripts
 
-All are bypassable. Host Bash belongs only to confirmed outside scope until a real sandbox is available.
+All are bypassable. Host Bash belongs only to outside scope until a real sandbox is available.
 
 ## 9. Test plan
 
@@ -270,20 +271,19 @@ All are bypassable. Host Bash belongs only to confirmed outside scope until a re
 
 ### Access-control unit tests
 
-- Challenge codes expire after 60 seconds.
-- Codes are one-use and user-specific.
-- Wrong codes do not change access.
-- Successful confirmation persists outside scope.
+- Outside transition immediately persists outside scope.
 - Restart/new access-control instance restores outside scope from preferences.
 - Project/revoke transitions are immediate, persisted, and idempotent.
-- Fake time makes challenge-expiration tests deterministic.
+- Scope changes return the correct session-reset instruction.
+- Outside activation returns the required warning and `/project` recovery instruction.
+- Only the authorized native command path can call scope-changing operations.
 
 ### Command tests
 
-- `/access status` reports project by default.
-- `/access outside` creates but does not activate a challenge.
-- `/access confirm <code>` persists outside scope and resets affected sessions.
-- `/access revoke` persists project scope, resets affected sessions, and reports project scope.
+- `/access` reports project by default.
+- `/outside` immediately persists outside scope, resets affected sessions, and returns the warning plus `/project` instructions.
+- `/project` persists project scope, resets affected sessions, and reports project scope.
+- Unknown `/outside`, `/project`, or `/access` variants cannot be forwarded to Pi.
 - `/security` gives migration guidance and cannot change access.
 - The model never receives an access command as Pi passthrough.
 
@@ -302,7 +302,7 @@ All are bypassable. Host Bash belongs only to confirmed outside scope until a re
 - Status truthfully reports persisted and active scope.
 - Scheduled sessions follow persisted project/outside scope.
 - A2A remains restricted while owner scope is outside.
-- Shutdown clears pending confirmation challenges without clearing persisted scope.
+- Shutdown leaves persisted scope unchanged.
 
 ### Full validation
 
@@ -330,7 +330,7 @@ Update together with implementation:
 - `docs/OPERATIONS.md` — describe persistent scope, revocation, status checks, and recovery.
 - `docs/ROADMAP.md` — mark the mode simplification and persistent scope work when complete.
 - `tree.md` — add the new modules and update affected descriptions.
-- `AGENTS.md` and `CLAUDE.md` — require installation agents to preserve project scope and never confirm outside access for the user.
+- `AGENTS.md` and `CLAUDE.md` — require installation agents to preserve project scope and never activate outside access unless the owner explicitly sends the command.
 - `CHANGELOG.md` — document migration and security impact.
 
 ## 11. Implementation sequence
@@ -351,10 +351,11 @@ Update together with implementation:
 
 ### Phase 3 — access control and commands
 
-1. Add short-lived in-memory confirmation challenges and persisted scope storage.
-2. Implement `/access status|outside|confirm|project|revoke`.
+1. Add persisted scope storage and immediate transition handling.
+2. Implement `/access`, `/outside`, and `/project`.
 3. Reset affected sessions whenever persisted scope changes.
-4. Add `/security` compatibility guidance.
+4. Return a prominent outside-access warning with `/project` recovery instructions.
+5. Add `/security` compatibility guidance.
 
 ### Phase 4 — migration
 
@@ -386,12 +387,13 @@ The change is complete only when:
 - Project `read`, `edit`, and `write` cannot escape the canonical Furby root.
 - Environment and related configuration files are readable/writable in project scope, while active databases, backups, private keys, and Git internals retain explicit protection.
 - Host Bash is absent in project scope.
-- Outside access requires a user-specific, short-lived confirmation.
+- `/outside` immediately activates without a confirmation challenge.
+- Its response prominently warns about host filesystem, shell, and scheduled-task access and explains `/project`.
 - Outside scope persists across sessions, resets, updates, and restarts until manually revoked.
 - Scheduled work follows persisted scope; A2A never inherits outside access.
 - Status output accurately reports persisted and active access.
 - Legacy configuration upgrades without startup failure.
-- Tests cover path escapes, symlinks, confirmation challenges, persistence, revocation, session reset, and purpose isolation.
+- Tests cover path escapes, symlinks, immediate scope changes, warnings, persistence, revocation, session reset, and purpose isolation.
 - Documentation never calls a cwd-only host shell “confined.”
 
 ## 13. Open decisions before implementation
@@ -400,10 +402,9 @@ Recommended defaults are shown in bold:
 
 1. Should `.data/personality.md` remain writable through general project file tools? **Yes.**
 2. Should dependency changes require outside access even though files are in the project? **File edits may occur in project scope, but package installation requires outside/Bash access.**
-3. Should `/access project` and `/access revoke` be aliases? **Yes.**
-4. Should persistent outside scope apply to scheduled tasks? **Yes; outside means outside until the owner changes it, and the confirmation must warn about unattended tasks.**
-5. Should real sandboxed project Bash be required for the first release of this design? **No; ship confined file tools first and add sandboxed shell separately.**
+3. Should persistent outside scope apply to scheduled tasks? **Yes; outside means outside until the owner changes it, and the activation response must warn about unattended tasks.**
+4. Should real sandboxed project Bash be required for the first release of this design? **No; ship confined file tools first and add sandboxed shell separately.**
 
 ## 14. Recommended decision
 
-Implement one always-capable assistant with **project scope by default**, confined project file tools that may read and write `.env` and related configuration, no host Bash in project scope, and **persistent outside scope** protected by a one-time confirmation challenge. Outside remains active across restarts until `/access project` or `/access revoke`; scheduled work follows that persisted scope, while A2A remains task-only. Treat a real project shell as a later OS-sandbox feature.
+Implement one always-capable assistant with **project scope by default**, confined project file tools that may read and write `.env` and related configuration, no host Bash in project scope, and **persistent outside scope activated immediately by `/outside`**. The activation response must prominently warn what outside access permits and show `/project`. Outside remains active across restarts until the owner changes it; scheduled work follows that persisted scope, while A2A remains task-only. Treat a real project shell as a later OS-sandbox feature.
