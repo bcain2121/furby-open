@@ -4,10 +4,23 @@ All notable changes to Furby Open will be documented here.
 
 ## Unreleased
 
+## [0.1.0-alpha.4] - 2026-07-27
+
 ### Added
 
-- File-by-file project map in `tree.md`, prioritized maturity roadmap, and detailed single access-scope migration plan
+- Cross-platform guided setup wizard for identity, private personality, Telegram, Pi login guidance, and validation
+- Checksum-verified macOS/Linux terminal installer with optional dependency installation
+- Windows PowerShell installer using explicit Windows Package Manager IDs
+- Double-click macOS `.command` and Windows `.cmd` launchers
+- Detailed installer, resume, troubleshooting, and uninstall documentation
+- File-by-file project map in `tree.md`, prioritized maturity roadmap, and approved single access-scope migration plan
 - Runtime policy tests for timezone and loopback-only A2A configuration
+
+### Changed
+
+- FFmpeg and Poppler are now correctly treated as optional feature dependencies for text-only installations
+- Doctor command detection now works natively on Windows
+- Manual bootstrap now installs locked dependencies with `npm ci`
 
 ### Fixed
 
@@ -20,22 +33,6 @@ All notable changes to Furby Open will be documented here.
 
 - Safe mode no longer exposes Pi's broad filesystem read tool
 - A2A is forced to safe mode, limited to task-response tools, and rejected on non-loopback hostnames
-
-## [0.1.0-alpha.4] - 2026-07-21
-
-### Added
-
-- Cross-platform guided setup wizard for identity, private personality, Telegram, Pi login guidance, and validation
-- Checksum-verified macOS/Linux terminal installer with optional dependency installation
-- Windows PowerShell installer using explicit Windows Package Manager IDs
-- Double-click macOS `.command` and Windows `.cmd` launchers
-- Detailed installer, resume, troubleshooting, and uninstall documentation
-
-### Changed
-
-- FFmpeg and Poppler are now correctly treated as optional feature dependencies for text-only installations
-- Doctor command detection now works natively on Windows
-- Manual bootstrap now installs locked dependencies with `npm ci`
 
 ## [0.1.0-alpha.3] - 2026-07-14
 
