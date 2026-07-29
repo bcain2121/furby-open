@@ -10,7 +10,7 @@ The project is not yet a polished general-public product. Its biggest gaps are o
 
 ## P0 — release confidence and truthful behavior
 
-1. **Ship and exercise the cross-platform release.** Publish the installer bundles, require Linux/macOS/Windows CI, and test a clean install, interrupted/resumed install, update, backup, restore, and uninstall on each supported platform.
+1. **Ship and exercise the cross-platform release.** Publish the installer bundles with reproducible local checks, then manually test a clean install, interrupted/resumed install, update, backup, restore, and uninstall on each supported platform before calling the release stable. Do not claim platforms that have not actually been exercised.
 2. **Finish conversation history or remove the claim.** SQLite contains conversation tables and `/memories` searches them, but normal runtime exchanges are not currently journaled there; Pi session files are the actual conversation record. Either add an explicit, privacy-documented conversation journal or remove conversation hits from the command until it exists.
 3. **Add real transport integration tests.** Unit tests cover batching and delivery well, but a test should drive a fake grammY update through authorization, batching, the runtime seam, and chunked delivery. This protects the production wiring, not just its parts.
 4. **Create migration fixtures.** Test opening databases from every published schema version, not only creating a new database in memory. Backward-compatible data is more important once public installations exist.
@@ -21,7 +21,7 @@ The project is not yet a polished general-public product. Its biggest gaps are o
 
 1. **Authenticate A2A before network expansion.** A2A is now disabled by default, forced to loopback, forced to safe mode, and limited to response tools. Add a real token or mutually authenticated transport before supporting reverse proxies or non-loopback use.
 2. **Replace safe/coding modes with explicit access scope.** Follow [`../plan.md`](../plan.md): keep the assistant fully capable, confine file tools to the project by default, make `/outside` immediately persist unrestricted access with a prominent warning and `/project` recovery instructions, let scheduled work follow the persisted owner scope, and keep A2A independently restricted.
-3. **Add release provenance.** Generate checksums automatically in a release workflow, attach an SBOM, sign tags/assets where practical, and publish the exact commit and dependency audit with each release.
+3. **Add release provenance.** Generate checksums through the local release script, attach an SBOM, sign tags/assets where practical, and publish the exact commit and dependency audit with each release. Hosted workflow automation is optional, not a release prerequisite.
 4. **Harden optional source downloads.** Pin `whisper.cpp` to a reviewed tag or commit and verify downloaded model artifacts. The current optional installer follows the upstream default branch.
 5. **Add network timeouts and size policy everywhere.** Telegram setup has a timeout, but weather, media download, file send, and OpenAI transcription should share bounded timeout/retry helpers.
 6. **Define a private-data threat model.** Document what safe mode protects against, what the authorized model can still see, what coding mode can access, and which local processes can reach the loopback listener.

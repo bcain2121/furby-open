@@ -135,7 +135,7 @@ furby-open/
 - **`.github/ISSUE_TEMPLATE/bug.yml`** — Structured bug report that asks for reproduction and environment details without secrets.
 - **`.github/ISSUE_TEMPLATE/feature.yml`** — Structured feature proposal focused on use case, privacy, and security impact.
 - **`.github/pull_request_template.md`** — Prompts contributors to explain behavior, risk, tests, and documentation changes.
-- **`.github/workflows/ci.yml`** — Runs safety checks, type checking, tests, installer packaging, and critical audit checks on Node 22/24 Linux, plus macOS/Windows smoke jobs and PowerShell parsing.
+- **`.github/workflows/ci.yml`** — Existing unchanged Linux automation for safety checks, type checking, tests, and critical audit checks on Node 22/24. Releases do not depend on changing this workflow; installer packaging and platform smoke checks are run separately.
 
 ## Project-local Pi skills
 

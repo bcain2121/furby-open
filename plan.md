@@ -8,7 +8,7 @@
 
 1. Preserve any private companion installation as a separate project; do not read its private runtime data into this repository or modify that checkout.
 2. Finish and publish the current Furby Open installer/reliability baseline before introducing the breaking access migration.
-3. Move the current `Unreleased` changelog entries into the baseline release notes, run Linux/macOS/Windows CI, attach installer bundles/checksums, and tag the exact validated commit.
+3. Move the current `Unreleased` changelog entries into the baseline release notes, run the reproducible local validation/package matrix, attach installer bundles/checksums, and tag the exact validated commit. Do not make release publication depend on changing GitHub Actions workflows.
 4. Start the access-scope work as `v0.2.0-alpha.1` because it changes commands, persisted preferences, tool assembly, configuration, and security semantics.
 5. Keep the source tree clean and use focused commits for policy, adapters, runtime wiring, commands/migration, and documentation.
 
@@ -321,7 +321,7 @@ npm run test:coverage
 npm audit --omit=dev --audit-level=critical
 ```
 
-Run clean-checkout Linux, macOS, and Windows CI because path canonicalization and permission behavior differ by OS.
+Before a stable release, run clean-checkout validation on Linux, macOS, and Windows using manually operated or independently provisioned machines because path canonicalization and permission behavior differs by OS. Alpha releases may use the reproducible local suite plus documented platform smoke results; do not claim an untested platform passed.
 
 ## 10. Documentation changes
 
