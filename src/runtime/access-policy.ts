@@ -64,7 +64,8 @@ function isProtectedProjectPath(relativePath: string) {
     || relativePath.startsWith('.data/furby-open.db-')
     || relativePath === '.data/backups'
     || relativePath.startsWith('.data/backups/')
-    || /(?:^|\/)[^/]*backup[^/]*\.(?:bak|tar|tar\.gz|tgz|zip)$/u.test(relativePath)
+    || /\.(?:bak|backup)$/u.test(baseName)
+    || /(?:^|\/)[^/]*backup[^/]*\.(?:tar|tar\.gz|tgz|zip)$/u.test(relativePath)
     || PROTECTED_CREDENTIAL_NAMES.has(baseName)
     || PROTECTED_CREDENTIAL_EXTENSIONS.has(extension);
 }

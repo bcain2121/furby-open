@@ -55,6 +55,7 @@ test('project access applies explicit configuration and protected-path rules', a
   await fs.writeFile(path.join(projectRoot, '.env'), 'SECRET=local');
   await fs.writeFile(path.join(projectRoot, '.data', 'personality.md'), 'Be direct.');
   await fs.writeFile(path.join(projectRoot, '.data', 'furby-open.db'), 'database');
+  await fs.writeFile(path.join(projectRoot, '.data', 'snapshot.bak'), 'backup');
   await fs.writeFile(path.join(projectRoot, '.git', 'config'), '[core]');
   await fs.writeFile(path.join(projectRoot, 'private-key.pem'), 'private');
 
@@ -64,6 +65,7 @@ test('project access applies explicit configuration and protected-path rules', a
   assert.equal(await policy.resolvePath('.env', 'write'), path.join(projectRoot, '.env'));
   assert.equal(await policy.resolvePath('.data/personality.md', 'write'), path.join(projectRoot, '.data', 'personality.md'));
   await assert.rejects(policy.resolvePath('.data/furby-open.db', 'read'), /protected project path/u);
+  await assert.rejects(policy.resolvePath('.data/snapshot.bak', 'read'), /protected project path/u);
   await assert.rejects(policy.resolvePath('private-key.pem', 'read'), /protected project path/u);
   assert.equal(await policy.resolvePath('.git/config', 'read'), path.join(projectRoot, '.git', 'config'));
   await assert.rejects(policy.resolvePath('.git/config', 'write'), /read-only project path/u);
