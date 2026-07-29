@@ -3,7 +3,11 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { SettingsManager } from '@earendil-works/pi-coding-agent';
 import { config } from '../src/config/env.js';
-import { FURBY_SESSION_SETTINGS, createFurbyCustomTools } from '../src/runtime/pi-session.js';
+import {
+  FURBY_SESSION_SETTINGS,
+  createFurbyCustomTools,
+  createFurbySessionToolConfiguration,
+} from '../src/runtime/pi-session.js';
 import {
   FURBY_EXCLUDED_GLOBAL_EXTENSIONS,
   FURBY_RESOURCE_POLICY,
@@ -38,6 +42,27 @@ test('Furby session settings explicitly deliver all steering and follow-up messa
   assert.equal(manager.getFollowUpMode(), 'all');
   assert.equal(manager.getGlobalSettings().compaction?.enabled, false);
   assert.equal(manager.getGlobalSettings().retry?.maxRetries, 1);
+});
+
+test('runtime tool assembly uses confined project tools, unrestricted outside built-ins, and isolated A2A tools', async () => {
+  const project = await createFurbySessionToolConfiguration(123, 'interactive', 'project');
+  assert.deepEqual(project.effectiveTools.builtIn, []);
+  assert.ok(project.effectiveTools.custom.includes('read'));
+  assert.ok(project.effectiveTools.custom.includes('edit'));
+  assert.ok(project.effectiveTools.custom.includes('write'));
+  assert.ok(!project.effectiveTools.custom.includes('bash'));
+  assert.ok(project.effectiveTools.custom.includes('furby_memory_save'));
+
+  const outside = await createFurbySessionToolConfiguration(123, 'scheduled', 'outside');
+  assert.deepEqual(outside.effectiveTools.builtIn, ['read', 'bash', 'edit', 'write']);
+  assert.ok(outside.effectiveTools.custom.includes('furby_memory_save'));
+  assert.equal(outside.customTools.some((tool: any) => ['read', 'edit', 'write'].includes(String(tool.name))), false);
+
+  const a2a = await createFurbySessionToolConfiguration(123, 'a2a', 'outside');
+  assert.deepEqual(a2a.effectiveTools, {
+    builtIn: [],
+    custom: ['write_a2a_response', 'list_a2a_pending'],
+  });
 });
 
 test('A2A response tools exist only in A2A sessions and Telegram sends are excluded there', () => {

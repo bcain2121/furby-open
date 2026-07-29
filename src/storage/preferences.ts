@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { defaultDbPath, openDatabase } from '../db/database.js';
+import type { AccessScope } from '../runtime/access-policy.js';
 
 interface UserPreferences {
   model?: string;
-  toolMode?: 'safe' | 'coding';
+  accessScope?: AccessScope;
 }
 
 interface LegacyPreferencesFile {
@@ -22,7 +23,7 @@ function parseUserPreferences(value: unknown): UserPreferences {
   const candidate = value as Record<string, unknown>;
   return {
     model: typeof candidate.model === 'string' ? candidate.model : undefined,
-    toolMode: candidate.toolMode === 'safe' || candidate.toolMode === 'coding' ? candidate.toolMode : undefined,
+    accessScope: candidate.accessScope === 'project' || candidate.accessScope === 'outside' ? candidate.accessScope : undefined,
   };
 }
 
@@ -98,12 +99,12 @@ export class PreferenceStore {
     this.updateUser(userId, { model });
   }
 
-  getToolMode(userId: number): 'safe' | 'coding' | undefined {
-    return this.getUser(userId).toolMode;
+  getAccessScope(userId: number): AccessScope {
+    return this.getUser(userId).accessScope ?? 'project';
   }
 
-  setToolMode(userId: number, toolMode: 'safe' | 'coding') {
-    this.updateUser(userId, { toolMode });
+  setAccessScope(userId: number, accessScope: AccessScope) {
+    this.updateUser(userId, { accessScope });
   }
 
   private updateUser(userId: number, patch: UserPreferences) {

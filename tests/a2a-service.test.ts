@@ -74,7 +74,7 @@ test('A2A service has one listener and completes standard JSON-RPC tasks in an i
   assert.equal(completed.status, 'completed');
   assert.equal(completed.result, 'network answer');
   assert.equal(calls.length, 1);
-  assert.equal(calls[0][3], 'safe');
+  assert.equal(calls[0][3], 'project');
   assert.equal(calls[0][5], 'a2a');
   assert.match(calls[0][1], /\[A2A:standard-task-1\]/u);
 

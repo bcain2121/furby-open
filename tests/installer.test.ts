@@ -48,6 +48,6 @@ test('shared setup fails closed without a TTY and preserves security rules', () 
   const source = read('src/scripts/setup.ts');
   assert.match(source, /!stdin\.isTTY \|\| !stdout\.isTTY/u);
   assert.match(source, /npmCommand, \['run', 'setup:telegram'\]/u);
-  assert.match(source, /without weakening safe mode, single-user authorization, workspace confinement/u);
+  assert.match(source, /without weakening project confinement, persistent access controls, single-user authorization/u);
   assert.match(source, /Nothing will be started automatically/u);
 });

@@ -39,8 +39,14 @@ for (const issue of validateRuntimeConfig()) {
   if (!issue.startsWith('TELEGRAM_')) fail(issue);
 }
 
-if (fs.existsSync(path.join(config.rootDir, '.env'))) pass('.env exists');
-else warn('.env missing; copy .env.example to .env');
+const projectEnvPath = path.join(config.rootDir, '.env');
+if (fs.existsSync(projectEnvPath)) {
+  pass('.env exists');
+  const envText = fs.readFileSync(projectEnvPath, 'utf8');
+  if (/^\s*FURBY_OPEN_TOOL_MODE\s*=/mu.test(envText)) {
+    warn('FURBY_OPEN_TOOL_MODE is deprecated and ignored; use /access, /outside, and /project.');
+  }
+} else warn('.env missing; copy .env.example to .env');
 
 if (looksPlaceholder(config.telegramBotToken)) fail('TELEGRAM_BOT_TOKEN missing or placeholder');
 else pass('TELEGRAM_BOT_TOKEN configured');

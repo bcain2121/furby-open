@@ -71,7 +71,7 @@ async function configurePersonality() {
     interests: await ask('Interests or recurring workflows it should understand? [none specified]: ') || 'none specified',
   }));
 
-  const personality = `# Private assistant personality\n\n- Assistant name: ${answers.assistantName}\n- Owner's preferred name: ${answers.ownerName}\n- Tone: ${answers.tone}\n- Proactivity: ${answers.proactivity}\n- Avoid: ${answers.avoid}\n- Interests and recurring workflows: ${answers.interests}\n\nApply these preferences without weakening safe mode, single-user authorization, workspace confinement, confirmation requirements, or any security rule in the public system prompt.\n`;
+  const personality = `# Private assistant personality\n\n- Assistant name: ${answers.assistantName}\n- Owner's preferred name: ${answers.ownerName}\n- Tone: ${answers.tone}\n- Proactivity: ${answers.proactivity}\n- Avoid: ${answers.avoid}\n- Interests and recurring workflows: ${answers.interests}\n\nApply these preferences without weakening project confinement, persistent access controls, single-user authorization, workspace confinement, or any security rule in the public system prompt.\n`;
 
   console.log('\nPersonality summary:\n');
   console.log(personality);

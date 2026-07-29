@@ -140,11 +140,12 @@ test('standalone Furby scheduler executes through the scheduled session purpose 
   const deliveries: string[] = [];
   const bot = { api: { sendMessage: async (_chatId: number, text: string) => { deliveries.push(text); } } } as any;
   const runtime = { prompt: async (...args: any[]) => { prompts.push(args); return { text: 'scheduled answer' }; } } as any;
-  const preferences = { getModel: () => 'test/model', getToolMode: () => 'safe' } as any;
+  const preferences = { getModel: () => 'test/model', getAccessScope: () => 'outside' } as any;
   const scheduler = new FurbyScheduler(bot, runtime, preferences, databaseFactory);
   await scheduler.tick();
 
   assert.equal(prompts.length, 1);
+  assert.equal(prompts[0][3], 'outside');
   assert.equal(prompts[0][5], 'scheduled');
   assert.equal(deliveries.length, 1);
   const resultDb = databaseFactory();

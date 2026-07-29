@@ -53,7 +53,7 @@ process.on('SIGINT', () => { void shutdown('SIGINT'); });
 process.on('SIGTERM', () => { void shutdown('SIGTERM'); });
 
 console.log(`[start] ${config.name}`);
-console.log(`[start] model=${config.defaultModel} fallback=${config.fallbackModel} toolMode=${config.toolMode}`);
+console.log(`[start] model=${config.defaultModel} fallback=${config.fallbackModel} accessScope=${preferences.getAccessScope(config.telegramUserId)}`);
 if (a2a) await a2a.start();
 scheduler.start();
 await bot.start();

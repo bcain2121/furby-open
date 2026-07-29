@@ -8,7 +8,7 @@ interface A2ARuntime {
     userId: number,
     text: string,
     modelName: string,
-    toolMode: 'safe' | 'coding',
+    accessScope: 'project' | 'outside',
     images: [],
     purpose: 'a2a',
   ): Promise<{ text: string }>;
@@ -239,7 +239,7 @@ export class FurbyA2AService {
         this.options.userId,
         `[A2A:${taskId}]\n\n${message}\n\n[/A2A:${taskId}]\n\nRespond to this network agent request. Use write_a2a_response with taskId ${taskId} for the final answer.`,
         this.options.modelName,
-        'safe',
+        'project',
         [],
         'a2a',
       );

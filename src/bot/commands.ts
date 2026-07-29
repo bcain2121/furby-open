@@ -3,7 +3,8 @@ import { appUserIdForTelegram, ensureTelegramUser, openDatabase } from '../db/da
 import { listRecentMediaAssets } from '../db/media.js';
 import { searchConversationMessages, searchMemories } from '../db/memory.js';
 import { listAvailableModelSummary, loadPiScopedModels, nextScopedModel, parseModelName } from '../models/model-selection.js';
-import { securityModeSummary } from '../runtime/capability-policy.js';
+import { AccessControl } from '../runtime/access-control.js';
+import { accessScopeSummary } from '../runtime/access-policy.js';
 import { sendVaultFileToTelegram } from '../runtime/telegram-tools.js';
 import type { FurbyPiRuntime } from '../runtime/pi-session.js';
 import { formatScheduleHelp, formatTaskTime, parseScheduleCommand } from '../scheduler/parse.js';
@@ -48,6 +49,8 @@ export interface TelegramCommandContext {
 }
 
 export function createTelegramCommandHandler(runtime: FurbyPiRuntime, preferences: PreferenceStore) {
+  const accessControl = new AccessControl(preferences);
+
   async function handleCommand({
     text,
     userId,
@@ -80,8 +83,9 @@ export function createTelegramCommandHandler(runtime: FurbyPiRuntime, preference
         `${code('/schedule list')} — list scheduled tasks`,
         `${code('/schedule every 30m do ...')} — create recurring task`,
         `${code('/schedule in 10m do ...')} — create one-time reminder`,
-        `${code('/security safe')} — switch to read-only/safe tool mode`,
-        `${code('/security coding')} — switch to full coding tool mode`,
+        `${code('/access')} — show persistent project/outside access`,
+        `${code('/outside')} — enable persistent host filesystem and shell access`,
+        `${code('/project')} — return to project-confined access`,
         `${code('/skill:name')} or ${code('!skill:name')} — run Pi slash command ${code('/skill:name')}`,
         `${code('/<pi-command>')} or ${code('!<pi-command>')} — forwards unknown commands to Pi`,
         `${code('/reset')} — reset current Pi session`,
@@ -152,7 +156,7 @@ export function createTelegramCommandHandler(runtime: FurbyPiRuntime, preference
         `${code('/help')} ${code('/status')} ${code('/model')} ${code('/models')}`,
         `${code('/skills')} ${code('/files')} ${code('/memories <query>')} ${code('/transcript')} ${code('/sendfile <path>')}`,
         `${code('/schedule list')} ${code('/schedule every 30m do ...')} ${code('/schedule in 10m do ...')}`,
-        `${code('/security safe|coding')} ${code('/reset')}`,
+        `${code('/access')} ${code('/outside')} ${code('/project')} ${code('/reset')}`,
         '',
         '<b>Pi passthrough</b>',
         `Known Telegram slash commands are handled by Furby. Unknown slash commands are forwarded to Pi as-is.`,
@@ -345,7 +349,6 @@ export function createTelegramCommandHandler(runtime: FurbyPiRuntime, preference
 
     if (command === '!status') {
       const status = runtime.status(userId);
-      const configuredToolMode = preferences.getToolMode(userId) ?? config.toolMode;
       await reply([
         '<b>Runtime status</b>',
         '',
@@ -353,36 +356,49 @@ export function createTelegramCommandHandler(runtime: FurbyPiRuntime, preference
         `Session requested model: ${code(status.requestedModel ?? 'none')}`,
         `Active session model: ${code(status.model ?? 'none')}`,
         `Fallback active: ${code(status.fallbackUsed ? 'yes' : 'no')}`,
-        `Configured security/tool mode: ${code(configuredToolMode)}`,
-        `Active session tool mode: ${code(status.toolMode)}`,
+        `Configured access scope: ${code(preferences.getAccessScope(userId))}`,
+        `Active session access scope: ${code(status.accessScope ?? 'none')}`,
         `Thinking: ${code(status.thinkingLevel)}`,
         `Pi agent dir: ${code(status.agentDir)}`,
       ].join('\n'));
       return;
     }
 
+    if (command === '!access') {
+      if (argument) {
+        await reply(`Usage: ${code('/access')}. Use ${code('/outside')} or ${code('/project')} to change scope.`);
+        return;
+      }
+      const result = accessControl.status(userId);
+      await reply([
+        '<b>Access scope</b>',
+        '',
+        `Current: ${code(result.scope)}`,
+        `Effective access: ${escapeHtml(accessScopeSummary(result.scope))}`,
+      ].join('\n'));
+      return;
+    }
+
+    if (command === '!outside' || command === '!project') {
+      if (argument) {
+        await reply(`Usage: ${code(command === '!outside' ? '/outside' : '/project')}`);
+        return;
+      }
+      const result = command === '!outside'
+        ? accessControl.activateOutside(userId)
+        : accessControl.activateProject(userId);
+      if (result.resetSessions) await runtime.resetAccessScope(userId);
+      await reply(escapeHtml(result.message));
+      return;
+    }
+
     if (command === '!security-mode' || command === '!security') {
-      const normalized = argument.toLowerCase();
-      if (!normalized || normalized === 'status') {
-        const currentMode = preferences.getToolMode(userId) ?? config.toolMode;
-        await reply([
-          '<b>Security mode</b>',
-          '',
-          `Current: ${code(currentMode)}`,
-          `Effective access: ${escapeHtml(securityModeSummary(currentMode))}`,
-          '',
-          `${code('safe')} = ${escapeHtml(securityModeSummary('safe'))}`,
-          `${code('coding')} = ${escapeHtml(securityModeSummary('coding'))}`,
-        ].join('\n'));
-        return;
-      }
-      if (!['safe', 'coding'].includes(normalized)) {
-        await reply(`Unknown security mode ${code(argument)}. Use ${code('safe')} or ${code('coding')}.`);
-        return;
-      }
-      preferences.setToolMode(userId, normalized as 'safe' | 'coding');
-      await runtime.reset(userId);
-      await reply(`✅ Security mode set to ${code(normalized)}. Session reset so the new tool allowlist takes effect.`);
+      await reply([
+        '<b>Security commands changed</b>',
+        '',
+        `${code('/security')} no longer changes capabilities.`,
+        `Use ${code('/access')} to inspect scope, ${code('/outside')} for persistent host access, or ${code('/project')} to return to confinement.`,
+      ].join('\n'));
       return;
     }
 
@@ -396,8 +412,8 @@ export function createTelegramCommandHandler(runtime: FurbyPiRuntime, preference
     const slashCommand = `/${rawCommand.slice(1)}${argument ? ` ${argument}` : ''}`;
     try {
       const model = preferences.getModel(userId) ?? config.defaultModel;
-      const toolMode = preferences.getToolMode(userId) ?? config.toolMode;
-      const response = await runtime.prompt(userId, slashCommand, model, toolMode);
+      const accessScope = preferences.getAccessScope(userId);
+      const response = await runtime.prompt(userId, slashCommand, model, accessScope);
       await replyFormatted(response.text);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

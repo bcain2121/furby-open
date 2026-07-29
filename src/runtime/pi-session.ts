@@ -15,12 +15,17 @@ import { formatMemoryContext, searchMemories } from '../db/memory.js';
 import { chooseModelResolution, parseModelName, requireAvailableModel } from '../models/model-selection.js';
 import { correlationId, logEvent } from '../observability/logger.js';
 import { createA2ATools } from '../a2a/tools.js';
-import { effectiveToolNames, type ToolMode } from './capability-policy.js';
+import {
+  effectiveAccessToolNames,
+  type AccessScope,
+  type FurbyPromptPurpose,
+} from './access-policy.js';
 import { InteractionQueue } from './interaction-queue.js';
 import { createFurbyResourceLoader } from './resource-policy.js';
 import { createDbTools } from './db-tools.js';
 import { createInfoTools } from './info-tools.js';
 import { createMediaTools } from './media-tools.js';
+import { createProjectFileTools } from './project-file-tools.js';
 import { createMemoryTools } from './memory-tools.js';
 import { createScheduleTools } from './schedule-tools.js';
 import { createTelegramTools } from './telegram-tools.js';
@@ -52,9 +57,7 @@ export function extractAssistantTextSince(messages: any[], startIndex = 0) {
   return '';
 }
 
-export type { ToolMode } from './capability-policy.js';
-
-export type FurbyPromptPurpose = 'interactive' | 'scheduled' | 'a2a';
+export type { AccessScope, FurbyPromptPurpose } from './access-policy.js';
 
 export const FURBY_SESSION_SETTINGS = Object.freeze({
   compaction: { enabled: false },
@@ -76,6 +79,27 @@ export function createFurbyCustomTools(userId: number, purpose: FurbyPromptPurpo
   ];
 }
 
+export async function createFurbySessionToolConfiguration(
+  userId: number,
+  purpose: FurbyPromptPurpose,
+  accessScope: AccessScope,
+  projectRoot = config.rootDir,
+) {
+  const furbyTools = createFurbyCustomTools(userId, purpose);
+  const projectFileTools = accessScope === 'project' && purpose !== 'a2a'
+    ? await createProjectFileTools(projectRoot)
+    : [];
+  const customTools: any[] = [...projectFileTools, ...furbyTools];
+  return {
+    customTools,
+    effectiveTools: effectiveAccessToolNames(
+      accessScope,
+      purpose,
+      customTools.map((tool: any) => String(tool.name)),
+    ),
+  };
+}
+
 interface SessionRecord {
   userId: number;
   purpose: FurbyPromptPurpose;
@@ -83,7 +107,7 @@ interface SessionRecord {
   requestedModelName: string;
   activeModelName: string;
   fallbackUsed: boolean;
-  toolMode: ToolMode;
+  accessScope: AccessScope;
 }
 
 export class FurbyPiRuntime {
@@ -110,7 +134,7 @@ export class FurbyPiRuntime {
     if (config.openrouterApiKey) this.authStorage.setRuntimeApiKey('openrouter', config.openrouterApiKey);
   }
 
-  private async createSession(userId: number, modelName: string, toolMode: ToolMode, purpose: FurbyPromptPurpose) {
+  private async createSession(userId: number, modelName: string, accessScope: AccessScope, purpose: FurbyPromptPurpose) {
     const safeUserId = String(userId).replace(/[^0-9]/g, '') || 'default';
     const sessionDir = purpose === 'interactive'
       ? path.join(config.sessionRoot, safeUserId)
@@ -145,16 +169,15 @@ export class FurbyPiRuntime {
 
     const settingsManager = SettingsManager.inMemory(FURBY_SESSION_SETTINGS);
 
-    const customTools = createFurbyCustomTools(userId, purpose);
+    const { customTools, effectiveTools } = await createFurbySessionToolConfiguration(
+      userId,
+      purpose,
+      accessScope,
+      config.rootDir,
+    );
 
     const freshSessionKey = `${purpose}:${userId}`;
     const useFreshSession = this.freshSessionKeys.has(freshSessionKey);
-    const effectiveTools = effectiveToolNames(toolMode, customTools.map((tool: any) => String(tool.name)));
-    if (purpose === 'a2a') {
-      for (const toolName of ['write_a2a_response', 'list_a2a_pending']) {
-        if (!effectiveTools.custom.includes(toolName)) effectiveTools.custom.push(toolName);
-      }
-    }
 
     const { session } = await createAgentSession({
       cwd: config.rootDir,
@@ -180,18 +203,18 @@ export class FurbyPiRuntime {
     userId: number,
     text: string,
     modelName: string,
-    toolMode: ToolMode = config.toolMode,
+    accessScope: AccessScope = 'project',
     images: FurbyImageInput[] = [],
     purpose: FurbyPromptPurpose = 'interactive',
   ): Promise<FurbyResponse> {
-    return this.interactions.run(`${purpose}:${userId}`, () => this.promptSerialized(userId, text, modelName, toolMode, images, purpose));
+    return this.interactions.run(`${purpose}:${userId}`, () => this.promptSerialized(userId, text, modelName, accessScope, images, purpose));
   }
 
   async promptInteractiveBatch(
     userId: number,
     text: string,
     modelName: string,
-    toolMode: ToolMode = config.toolMode,
+    accessScope: AccessScope = 'project',
     images: FurbyImageInput[] = [],
   ) {
     let resolveReady!: (record: SessionRecord | null) => void;
@@ -204,7 +227,7 @@ export class FurbyPiRuntime {
         userId,
         text,
         modelName,
-        toolMode,
+        accessScope,
         images,
         'interactive',
         resolveReady,
@@ -245,7 +268,7 @@ export class FurbyPiRuntime {
     userId: number,
     text: string,
     modelName: string,
-    toolMode: ToolMode,
+    accessScope: AccessScope,
     images: FurbyImageInput[],
     purpose: FurbyPromptPurpose,
     onSessionReady?: (record: SessionRecord) => void,
@@ -253,9 +276,9 @@ export class FurbyPiRuntime {
     const canonicalModelName = parseModelName(modelName).canonical;
     const sessionKey = `${purpose}:${userId}`;
     let record = this.sessions.get(sessionKey);
-    if (!record || record.requestedModelName !== canonicalModelName || record.toolMode !== toolMode) {
+    if (!record || record.requestedModelName !== canonicalModelName || record.accessScope !== accessScope) {
       record?.session.dispose();
-      const created = await this.createSession(userId, canonicalModelName, toolMode, purpose);
+      const created = await this.createSession(userId, canonicalModelName, accessScope, purpose);
       record = {
         userId,
         purpose,
@@ -263,7 +286,7 @@ export class FurbyPiRuntime {
         requestedModelName: created.modelResolution.requested,
         activeModelName: created.modelResolution.active,
         fallbackUsed: created.modelResolution.fallbackUsed,
-        toolMode,
+        accessScope,
       };
       this.sessions.set(sessionKey, record);
     }
@@ -280,7 +303,7 @@ export class FurbyPiRuntime {
       purpose,
       requestedModel: record.requestedModelName,
       activeModel: record.activeModelName,
-      toolMode,
+      accessScope,
     });
 
     let streamedText = '';
@@ -358,6 +381,20 @@ export class FurbyPiRuntime {
     else this.freshSessionKeys.delete(key);
   }
 
+  async resetAccessScope(userId: number) {
+    const affectedKeys = new Set([`interactive:${userId}`, `scheduled:${userId}`]);
+    const activeSessions = [...affectedKeys]
+      .map((key) => this.sessions.get(key)?.session)
+      .filter((session): session is AgentSession => Boolean(session));
+    await Promise.allSettled(activeSessions.map((session) => session.abort()));
+    await this.interactions.waitForIdle((key) => affectedKeys.has(key));
+    for (const key of affectedKeys) {
+      this.sessions.get(key)?.session.dispose();
+      this.sessions.delete(key);
+      this.freshSessionKeys.add(key);
+    }
+  }
+
   async abortPurpose(purpose: FurbyPromptPurpose) {
     const records = [...this.sessions.values()].filter((record) => record.purpose === purpose);
     await Promise.allSettled(records.map((record) => record.session.abort()));
@@ -379,7 +416,7 @@ export class FurbyPiRuntime {
       requestedModel: record?.requestedModelName ?? null,
       model: record?.activeModelName ?? null,
       fallbackUsed: record?.fallbackUsed ?? false,
-      toolMode: record?.toolMode ?? config.toolMode,
+      accessScope: record?.accessScope ?? null,
       thinkingLevel: config.piThinkingLevel,
       agentDir: config.piAgentDir,
     };

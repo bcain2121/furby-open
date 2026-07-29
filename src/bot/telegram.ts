@@ -68,7 +68,9 @@ export function createTelegramBot(runtime: FurbyPiRuntime, preferences: Preferen
     { command: 'transcript', description: 'Show latest voice transcript' },
     { command: 'sendfile', description: 'Send a vault file/photo back to Telegram' },
     { command: 'schedule', description: 'Manage scheduled tasks' },
-    { command: 'security', description: 'Show/set security mode' },
+    { command: 'access', description: 'Show persistent access scope' },
+    { command: 'outside', description: 'Enable persistent host access' },
+    { command: 'project', description: 'Return to project-confined access' },
     { command: 'reset', description: 'Reset current Pi session' },
   ]).catch((error) => console.warn('[telegram] setMyCommands failed', error));
 
@@ -108,13 +110,13 @@ export function createTelegramBot(runtime: FurbyPiRuntime, preferences: Preferen
   async function submitInteractive(ctx: any, message: InteractiveMessage) {
     const userId = ctx.from.id as number;
     const model = preferences.getModel(userId) ?? config.defaultModel;
-    const toolMode = preferences.getToolMode(userId) ?? config.toolMode;
+    const accessScope = preferences.getAccessScope(userId);
     const submission = broker.submit(userId, message, {
       runInitial: async (messages) => runtime.promptInteractiveBatch(
         userId,
         combineInteractiveMessages(messages),
         model,
-        toolMode,
+        accessScope,
         messages.flatMap((item) => item.images ?? []),
       ),
       steer: async (nextMessage) => runtime.steerInteractive(userId, nextMessage.text, nextMessage.images ?? []),

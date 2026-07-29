@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { createAgentSession, SessionManager, SettingsManager } from '@earendil-works/pi-coding-agent';
 import { createProjectFileTools } from '../src/runtime/project-file-tools.js';
 
 function toolByName(tools: Awaited<ReturnType<typeof createProjectFileTools>>, name: string) {
@@ -14,6 +15,32 @@ function toolByName(tools: Awaited<ReturnType<typeof createProjectFileTools>>, n
 async function execute(tool: ReturnType<typeof toolByName>, input: unknown) {
   return tool.execute('test-call', input as never, undefined, undefined, {} as never);
 }
+
+test('Pi SDK uses confined project definitions instead of same-named unrestricted built-ins', async (t) => {
+  const parent = await fs.mkdtemp(path.join(os.tmpdir(), 'furby-sdk-project-tools-'));
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  const projectRoot = path.join(parent, 'project');
+  const outsideFile = path.join(parent, 'outside.txt');
+  await fs.mkdir(projectRoot);
+  await fs.writeFile(outsideFile, 'outside');
+
+  const customTools = await createProjectFileTools(projectRoot);
+  const { session } = await createAgentSession({
+    cwd: projectRoot,
+    tools: ['read', 'edit', 'write'],
+    customTools: customTools as any,
+    sessionManager: SessionManager.inMemory(projectRoot),
+    settingsManager: SettingsManager.inMemory(),
+  });
+  t.after(() => session.dispose());
+
+  const readTool = session.agent.state.tools.find((tool) => tool.name === 'read');
+  assert.ok(readTool);
+  await assert.rejects(
+    readTool.execute('sdk-test', { path: outsideFile }, undefined, undefined),
+    /outside the Furby Open project/u,
+  );
+});
 
 test('project file tools reject reads and writes above the configured size bound', async (t) => {
   const projectRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'furby-bounded-tools-'));

@@ -61,7 +61,7 @@ export class FurbyScheduler {
 
         const telegramUserId = Number(task.user_id.replace(/^telegram:/u, '')) || config.telegramUserId;
         const model = this.preferences.getModel(telegramUserId) ?? config.defaultModel;
-        const toolMode = this.preferences.getToolMode(telegramUserId) ?? config.toolMode;
+        const accessScope = this.preferences.getAccessScope(telegramUserId);
 
         let responseText: string;
         try {
@@ -69,7 +69,7 @@ export class FurbyScheduler {
             telegramUserId,
             `Scheduled assistant task: ${task.prompt}`,
             model,
-            toolMode,
+            accessScope,
             [],
             'scheduled',
           );

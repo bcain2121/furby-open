@@ -18,14 +18,14 @@ test('preference store migrates legacy JSON and persists updates in SQLite', (t)
 
   const preferences = new PreferenceStore(legacyPath, dbPath);
   assert.equal(preferences.getModel(42), 'minimax/MiniMax-M3');
-  assert.equal(preferences.getToolMode(42), 'safe');
+  assert.equal(preferences.getAccessScope(42), 'project');
 
   preferences.setModel(42, 'openai-codex/gpt-5.6-sol');
-  preferences.setToolMode(42, 'coding');
+  preferences.setAccessScope(42, 'outside');
 
   const restarted = new PreferenceStore(legacyPath, dbPath);
   assert.equal(restarted.getModel(42), 'openai-codex/gpt-5.6-sol');
-  assert.equal(restarted.getToolMode(42), 'coding');
+  assert.equal(restarted.getAccessScope(42), 'outside');
 });
 
 test('corrupt legacy preference JSON does not erase SQLite preferences', (t) => {

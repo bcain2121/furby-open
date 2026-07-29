@@ -42,7 +42,6 @@ const schema = z.object({
   FURBY_OPEN_LOAD_GLOBAL_SKILLS: z.string().optional().transform((value) => value === undefined
     ? false
     : ['1', 'true', 'yes', 'on'].includes(value.toLowerCase())),
-  FURBY_OPEN_TOOL_MODE: z.enum(['safe', 'coding']).default('safe'),
   TELEGRAM_COALESCE_MS: z.coerce.number().int().min(0).max(10_000).default(800),
   FURBY_OPEN_A2A_ENABLED: z.string().optional().transform((value) => value === undefined
     ? false
@@ -83,7 +82,6 @@ export const config = {
   piPromptTimeoutSeconds: parsed.PI_PROMPT_TIMEOUT_SECONDS,
   sessionRoot: path.resolve(rootDir, parsed.PI_SESSION_ROOT),
   loadGlobalSkills: parsed.FURBY_OPEN_LOAD_GLOBAL_SKILLS,
-  toolMode: parsed.FURBY_OPEN_TOOL_MODE,
   telegramCoalesceMs: parsed.TELEGRAM_COALESCE_MS,
   a2aEnabled: parsed.FURBY_OPEN_A2A_ENABLED,
   a2aHostname: parsed.FURBY_OPEN_A2A_HOSTNAME,
