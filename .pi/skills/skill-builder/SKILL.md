@@ -46,4 +46,4 @@ Keep `SKILL.md` concise and move long reference material into one-level-deep sup
 3. Run focused script tests with disposable data.
 4. Run `npm run build` and `npm test` if application code changed.
 5. Explain how to invoke the skill and how to remove it.
-6. Return to safe mode after implementation when coding access is no longer needed.
+6. If `/outside` was needed for host shell work, return to project confinement with `/project` when finished.

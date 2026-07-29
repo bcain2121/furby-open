@@ -4,6 +4,24 @@ All notable changes to Furby Open will be documented here.
 
 ## Unreleased
 
+### Added
+
+- Canonically confined project `read`, `edit`, and `write` tools with symlink, traversal, protected-path, and file-size enforcement
+- Persistent owner access scope stored in SQLite and shared by interactive and scheduled work
+- Native `/access`, `/outside`, and `/project` Telegram commands with immediate outside activation, durable revocation, session resets, and recovery warnings
+
+### Changed
+
+- Replaced owner-facing safe/coding modes with one always-capable assistant in project scope by default
+- Project scope permits `.env`, personality, source, skill, and configuration changes while withholding host Bash
+- Outside scope uses Pi's unrestricted filesystem and shell tools until the owner sends `/project`
+- A2A remains independently task-response-only regardless of owner scope
+- Legacy `FURBY_OPEN_TOOL_MODE` values are ignored and reported by doctor without revealing their contents
+
+### Removed
+
+- Safe/coding capability policy and `/security` mode switching; `/security` now provides migration guidance
+
 ## [0.1.0-alpha.4] - 2026-07-27
 
 ### Added

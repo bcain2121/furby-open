@@ -33,21 +33,26 @@ Only the numeric `TELEGRAM_USER_ID` in `.env` is allowed through the bot middlew
 
 Prefer `npm run setup:telegram` during installation. It accepts the token through a hidden local terminal prompt, verifies it directly with Telegram, discovers the owner ID only after a private `/start` message, asks for confirmation, and writes ignored `.env` without printing the token. Do not paste bot tokens into coding-agent chats.
 
-### Safe mode
+### Project scope
 
-The public default is `FURBY_OPEN_TOOL_MODE=safe`. It exposes only read-only assistant capabilities selected by an explicit allowlist and confined to assistant data or the configured workspace. Pi's broad filesystem `read` tool is deliberately absent in safe mode.
+Every new installation defaults to persistent project scope. Ordinary assistant capabilities remain available, while custom `read`, `edit`, and `write` adapters canonically confine file operations beneath the Furby Open root. Traversal, absolute outside paths, and symlink escapes are rejected. Host Bash is absent; setting a working directory alone would not constitute a sandbox.
 
-### Coding mode
+Project scope intentionally permits reading and writing `.env`, `.env.*`, `.data/personality.md`, package manifests, and other project configuration. The model may therefore encounter credentials. It must not access secrets unnecessarily or disclose them through replies, logs, generated files, commits, tools, or network requests. Raw SQLite files, backup paths, private keys/certificates, and writes to Git internals remain blocked.
 
-Coding mode gives the model shell and filesystem modification tools. Commands can leave the repository directory. Enable it only when you trust the active model, prompt, loaded skills, and machine account.
+### Outside scope
+
+The authorized owner can send `/outside` to immediately persist unrestricted Pi filesystem and host-shell tools. There is no second challenge or automatic timeout. Outside scope survives sessions, updates, and restarts and also applies to scheduled tasks until the owner sends `/project`.
+
+The activation response always warns about this reach and displays `/project` recovery instructions. Only native owner commands can change scope; the model, skills, tools, schedules, and A2A requests cannot do so.
 
 Recommended precautions:
 
 - run under a non-administrator OS account
 - keep backups
-- review proposed commands and changes
-- avoid mounting secrets that the assistant does not need
-- switch back to safe mode after customization
+- review requested commands and changes
+- avoid exposing secrets that the assistant does not need
+- check `/access` after restarts and updates
+- send `/project` as soon as unrestricted host access is no longer wanted
 
 ### Pi skills and packages
 
@@ -61,7 +66,7 @@ Use `scripts/update.sh` rather than an unreviewed pull. It requires a clean sour
 
 ### A2A
 
-The A2A endpoint is disabled by default. Its current protocol has no authentication, and runtime validation refuses non-loopback hostnames. A2A work is forced into safe mode with only task-response tools; it cannot use Telegram, database, memory, workspace, or coding tools. Do not proxy the listener to an untrusted network.
+The A2A endpoint is disabled by default. Its current protocol has no authentication, and runtime validation refuses non-loopback hostnames. A2A runs in a separate purpose-specific runtime with only task-response tools regardless of the owner's project/outside scope; it cannot use Telegram, database, memory, workspace, filesystem, or shell tools. Do not proxy the listener to an untrusted network.
 
 ### Secrets and private data
 

@@ -24,9 +24,11 @@ Furby Open is intentionally a small application around Pi rather than a replacem
 
 The runtime loads project-local Pi skills but not global extension lifecycles. Global skills are excluded by default, preventing a public checkout from inheriting unrelated private capabilities. Users may explicitly opt into global skills with `FURBY_OPEN_LOAD_GLOBAL_SKILLS=true`.
 
-### Capability policy
+### Access policy
 
-Safe mode uses an explicit allowlist of read-only assistant tools confined to assistant data and the configured workspace; Pi's broad filesystem `read` tool is not exposed. Coding mode enables Pi's `read`, `bash`, `edit`, and `write` tools plus all assistant tools. Mode changes reset the interactive session so the active tool set is truthful.
+`src/runtime/access-policy.ts` owns the persistent `project | outside` vocabulary, purpose-specific tool selection, canonical root checks, and protected-path rules. In project scope, `src/runtime/project-file-tools.ts` injects same-named custom Pi `read`, `edit`, and `write` definitions backed by revalidating filesystem operations; host Bash is absent. In outside scope, Pi's unrestricted `read`, `bash`, `edit`, and `write` are used. All Furby tools remain available in either owner scope.
+
+`src/runtime/access-control.ts` persists immediate `/outside` and `/project` transitions through SQLite preferences and provides warning/recovery messages. Scope changes abort and dispose affected interactive/scheduled sessions before fresh scope-specific sessions are created. Scheduled work follows persisted owner scope; A2A never does.
 
 ### SQLite
 
@@ -42,7 +44,7 @@ The scheduler claims due work with leases before execution, uses a separate Pi s
 
 ### A2A
 
-The optional A2A service exposes JSON-RPC task submission, polling, and streaming on localhost. It is disabled by default and currently unauthenticated. Runtime validation refuses non-loopback binding, A2A sessions are forced to safe mode, and they receive only the two task-response tools rather than Telegram, database, memory, or workspace tools.
+The optional A2A service exposes JSON-RPC task submission, polling, and streaming on localhost. It is disabled by default and currently unauthenticated. Runtime validation refuses non-loopback binding, and A2A sessions receive only the two task-response tools rather than Telegram, database, memory, workspace, filesystem, or shell tools, regardless of owner scope.
 
 ## Request flow
 
@@ -51,7 +53,7 @@ Telegram update
   -> single-user middleware
   -> command handler OR interactive message broker
   -> purpose-isolated Pi runtime session
-  -> capability policy + project resource policy
+  -> persistent access policy + project resource policy
   -> model and approved tools
   -> chunked/retried Telegram delivery
 ```

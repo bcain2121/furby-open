@@ -23,8 +23,9 @@ npm start
 Telegram
   -> src/bot/telegram.ts authorization/media routing
   -> src/runtime/interactive-message-broker.ts batching or steering
-  -> src/runtime/pi-session.ts model session
-  -> src/runtime/capability-policy.ts tool allowlist
+  -> src/runtime/pi-session.ts scope/purpose-specific model session
+  -> src/runtime/access-policy.ts access and path policy
+  -> src/runtime/project-file-tools.ts confined project operations when applicable
   -> src/runtime/resource-policy.ts project skill/prompt isolation
   -> model and approved runtime tools
   -> src/bot/telegram-delivery.ts
@@ -100,9 +101,9 @@ furby-open/
 - **`LICENSE`** — MIT license for the public source.
 - **`package-lock.json`** — Exact npm dependency graph used by `npm ci`, CI, installers, and updater validation.
 - **`package.json`** — Project identity, Node requirement, pinned Pi dependencies, runtime/development dependencies, and all npm command entry points.
-- **`plan.md`** — Approved migration plan from safe/coding modes to one always-capable assistant with project-confined file tools and persistent owner-selected outside access with explicit recovery instructions.
+- **`plan.md`** — Implemented migration record from safe/coding modes to one always-capable assistant with project-confined file tools and persistent owner-selected outside access with explicit recovery instructions.
 - **`README.md`** — Main product explanation, quick install paths, security modes, extension model, updates, and links to detailed docs.
-- **`SECURITY.md`** — Threat model, reporting process, known upstream advisories, installer trust, capability modes, A2A restrictions, and secret-handling rules.
+- **`SECURITY.md`** — Threat model, reporting process, known upstream advisories, installer trust, persistent access scopes, path restrictions, A2A isolation, and secret-handling rules.
 - **`tree.md`** — This source map; complements `docs/ARCHITECTURE.md` with per-file ownership and interactions.
 - **`tsconfig.json`** — Strict NodeNext TypeScript checking, including unused code/parameter detection, for `src/` and `tests/`; currently performs no emit.
 
@@ -213,7 +214,7 @@ src/
 
 - **`src/index.ts`** — Composition root. Validates configuration, initializes the owner/database, constructs runtime/transport/scheduler/A2A modules, starts them, and coordinates shutdown.
 - **`src/config/env.ts`** — Loads private environment values with Zod, normalizes paths/defaults, validates Telegram/timezone/A2A policy, and exports the runtime configuration snapshot.
-- **`src/config/system.md`** — Public operational prompt: useful behavior, skill policy, truthfulness, extension rules, security, and Telegram formatting.
+- **`src/config/system.md`** — Public operational prompt: useful behavior, skill policy, truthfulness, scope boundaries, secret handling, and Telegram formatting.
 - **`src/config/soul.md`** — Neutral public persona loaded after runtime identity context and before ignored `.data/personality.md`.
 
 ### Telegram transport
@@ -227,7 +228,7 @@ src/bot/
 └── telegram.ts
 ```
 
-- **`src/bot/commands.ts`** — Parses native `/` and legacy `!` commands; handles model, status, skills, media, memory, schedule, security, reset, and Pi command passthrough using runtime/storage modules.
+- **`src/bot/commands.ts`** — Parses native `/` and legacy `!` commands; handles model, status, skills, media, memory, schedules, native access transitions, reset, and Pi command passthrough using runtime/storage modules.
 - **`src/bot/media.ts`** — Downloads bounded Telegram files, sanitizes names, writes through workspace confinement, ensures the owner record, and inserts media metadata.
 - **`src/bot/telegram-delivery.ts`** — Sends sequential Telegram chunks with pacing, 429 retries, and formatting-only fallback.
 - **`src/bot/telegram-format.ts`** — Escapes HTML, converts supported Markdown, and splits by final Telegram payload size without breaking surrogate pairs.
@@ -237,7 +238,8 @@ src/bot/
 
 ```text
 src/runtime/
-├── capability-policy.ts
+├── access-control.ts
+├── access-policy.ts
 ├── db-tools.ts
 ├── info-tools.ts
 ├── interaction-queue.ts
@@ -245,20 +247,23 @@ src/runtime/
 ├── media-tools.ts
 ├── memory-tools.ts
 ├── pi-session.ts
+├── project-file-tools.ts
 ├── resource-policy.ts
 ├── schedule-tools.ts
 ├── telegram-tools.ts
 └── vault-tools.ts
 ```
 
-- **`src/runtime/capability-policy.ts`** — Defines safe/coding tool allowlists. Safe mode has no broad Pi built-ins and permits only approved read-only assistant tools.
+- **`src/runtime/access-control.ts`** — Persists immediate owner project/outside transitions and supplies truthful status, warning, and `/project` recovery messages.
+- **`src/runtime/access-policy.ts`** — Defines access scopes, purpose-specific tool selection, canonical project confinement, and centralized protected-path rules.
 - **`src/runtime/db-tools.ts`** — Exposes bounded, query-only SQLite inspection and rejects mutation, PRAGMA, and multiple statements.
 - **`src/runtime/info-tools.ts`** — Pi tools for timezone-aware current time and external weather lookup.
 - **`src/runtime/interaction-queue.ts`** — Serializes Pi operations by purpose/user key while allowing different keys to run independently.
 - **`src/runtime/interactive-message-broker.ts`** — Coalesces rapid Telegram messages, assigns one reply owner, and steers messages arriving during an active Pi run.
 - **`src/runtime/media-tools.ts`** — Lists uploaded media and queues bounded text/PDF extraction, updating stored previews.
 - **`src/runtime/memory-tools.ts`** — Saves and searches durable owner memories and searches the conversation FTS tables.
-- **`src/runtime/pi-session.ts`** — Main Pi orchestration module: auth/model registry, purpose-specific sessions, prompts/personality/resources, tools, serialization, streaming, timeout/abort/reset, and automatic memory/media context.
+- **`src/runtime/pi-session.ts`** — Main Pi orchestration module: auth/model registry, scope/purpose-specific sessions, prompts/personality/resources, tools, serialization, streaming, timeout/abort/reset, and automatic memory/media context.
+- **`src/runtime/project-file-tools.ts`** — Builds Pi-compatible confined `read`, `edit`, and `write` definitions with path revalidation and bounded file sizes.
 - **`src/runtime/resource-policy.ts`** — Configures Pi resource loading: no extensions/themes, project-local prompts/agent files, and project-only skills unless global skills are explicitly enabled.
 - **`src/runtime/schedule-tools.ts`** — Pi tools to create/list/pause/resume/delete scheduled tasks using configured timezone display.
 - **`src/runtime/telegram-tools.ts`** — Sends bounded, non-sensitive files from the confined workspace back to the authorized Telegram owner.
@@ -300,7 +305,7 @@ src/
 - **`src/db/media.ts`** — Media hashing, lightweight previews, confined writes, metadata upsert/list/lookup/update operations.
 - **`src/db/memory.ts`** — Durable memory save/search, conversation FTS search, and prompt-context formatting.
 - **`src/db/schema.ts`** — WAL/foreign-key setup and versioned schema for users, identities, memories/FTS, conversations/FTS, media, schedules/runs, preferences, and import bookkeeping.
-- **`src/storage/preferences.ts`** — Per-Telegram-user model/tool-mode preferences in SQLite plus one-time migration from legacy JSON.
+- **`src/storage/preferences.ts`** — Per-Telegram-user model and persistent access-scope preferences in SQLite plus one-time migration from legacy JSON.
 - **`src/storage/vault-path.ts`** — Canonical workspace confinement that rejects traversal and existing/ancestor symlink escapes.
 
 ### Scheduler
@@ -363,7 +368,7 @@ src/
 - **`src/scripts/doctor.ts`** — Readiness report for credentials, paths, timezone/A2A policy, disk, SQLite integrity/migration, Pi auth/settings, system commands, external skills, and transcription.
 - **`src/scripts/import-agent-skills.ts`** — CLI discovery, filtering, review, confirmation, and import flow for Codex/Claude/shared skills.
 - **`src/scripts/setup-telegram.ts`** — Hidden token entry, Telegram API verification, private `/start` owner discovery, explicit authorization, secure `.env` update, and later verification.
-- **`src/scripts/setup.ts`** — Shared cross-platform interactive wizard for private personality, Telegram helper, Pi `/login`, readiness summary, and optional confirmed startup.
+- **`src/scripts/setup.ts`** — Shared cross-platform interactive wizard for private personality, Telegram helper, Pi `/login`, project-scope guidance, readiness summary, and optional confirmed startup.
 - **`src/scripts/smoke-pi.ts`** — Executes one real Pi prompt and now preserves a failing process status for automation.
 - **`src/setup/env-file.ts`** — Minimal targeted `.env` reader/updater that rejects key/value line injection without printing unrelated secrets.
 - **`src/skills/external-skill-importer.ts`** — Detects agent executables/directories, discovers bounded `SKILL.md` trees, validates frontmatter, rejects symlinks, warns on provider-specific syntax, atomically imports, and records provenance.
@@ -373,7 +378,8 @@ src/
 ```text
 tests/
 ├── a2a-service.test.ts
-├── capability-policy.test.ts
+├── access-control.test.ts
+├── access-policy.test.ts
 ├── commands.test.ts
 ├── config.test.ts
 ├── control-reliability.test.ts
@@ -388,6 +394,7 @@ tests/
 ├── memory.test.ts
 ├── model-selection.test.ts
 ├── preferences.test.ts
+├── project-file-tools.test.ts
 ├── resource-policy.test.ts
 ├── retention.test.ts
 ├── scheduler.test.ts
@@ -399,7 +406,8 @@ tests/
 ```
 
 - **`tests/a2a-service.test.ts`** — Listener lifecycle, JSON-RPC completion, invalid/oversized requests, and pending-task restart recovery.
-- **`tests/capability-policy.test.ts`** — Confined safe allowlist, full coding set, and fail-closed behavior for future tools.
+- **`tests/access-control.test.ts`** — Immediate scope transitions, persistence across restarts, idempotent project revocation, warnings, and recovery instructions.
+- **`tests/access-policy.test.ts`** — Scope/purpose tool selection, canonical confinement, protected paths, `.env` access, and symlink escapes.
 - **`tests/commands.test.ts`** — Model/reset command side effects, Pi passthrough, and Telegram-size skill pagination.
 - **`tests/config.test.ts`** — Timezone validation, loopback-only A2A host policy, and configured-timezone schedule display.
 - **`tests/control-reliability.test.ts`** — Prompt security invariants, fresh/stale session guards, public defaults, smoke-test exit behavior, and non-blocking Telegram submission wiring.
@@ -413,7 +421,8 @@ tests/
 - **`tests/media.test.ts`** — Text cleanup/truncation and plain-text extraction.
 - **`tests/memory.test.ts`** — Memory FTS save/search/context and conversation FTS querying.
 - **`tests/model-selection.test.ts`** — Alias normalization, unavailable-model rejection, and truthful fallback reporting.
-- **`tests/preferences.test.ts`** — Legacy JSON migration, SQLite persistence, and corrupt-input safety.
+- **`tests/preferences.test.ts`** — Legacy JSON migration to default project scope, persistent owner scope/model state, and corrupt-input safety.
+- **`tests/project-file-tools.test.ts`** — Real confined read/edit/write behavior, Pi same-name tool replacement, size bounds, protected paths, and outside rejection.
 - **`tests/resource-policy.test.ts`** — Project resource isolation, session steering settings, A2A-only tools, and exclusion of global scheduler lifecycle.
 - **`tests/retention.test.ts`** — Review-before-delete retention behavior.
 - **`tests/scheduler.test.ts`** — Parsing, CRUD, atomic claims, retries, purpose isolation, execution, and lease recovery.

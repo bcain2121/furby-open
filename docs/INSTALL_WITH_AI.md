@@ -14,7 +14,7 @@ First offer the owner the platform installer in [`INSTALLER.md`](INSTALLER.md). 
 - Pause at each human-authentication gate and wait for the owner to say it is complete.
 - Never ask the owner to paste a Telegram token, API key, OAuth code, or `.env` contents into agent chat.
 - Never print `.env`, `~/.pi/agent/auth.json`, or secret values.
-- Do not start Furby Open or enable coding mode without explicit approval.
+- Do not start Furby Open without explicit approval. Never activate `/outside` for the owner.
 
 ## Stage 1: inspect and bootstrap
 
@@ -134,7 +134,7 @@ Explain warnings versus blocking failures. When checks pass, summarize:
 
 - assistant identity and personality location
 - selected provider/model
-- safe-mode limitations
+- project-scope confinement and the absence of host Bash
 - where private data is stored
 - how to start and stop the app
 - how to update and back up the app
@@ -154,7 +154,7 @@ Have the owner send these messages to the new bot:
 hello
 ```
 
-Keep `FURBY_OPEN_TOOL_MODE=safe` until the owner deliberately chooses otherwise.
+Keep the default persistent project scope. Explain `/access`, `/outside`, and `/project`, including that outside access is immediate, survives restarts, applies to scheduled tasks, and must be returned manually with `/project`.
 
 ## Future updates
 

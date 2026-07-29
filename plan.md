@@ -1,6 +1,6 @@
 # Single access-scope implementation plan
 
-**Status:** Approved implementation plan; not yet implemented
+**Status:** Implemented on the `v0.2.0-alpha.1` development branch; release validation in progress
 
 **Purpose:** Replace Furby Open's safe/coding modes with one always-capable assistant whose filesystem reach is confined by default and explicitly expandable by the authorized owner until they change it back.
 
@@ -168,7 +168,7 @@ Security properties:
 - The `project` or `outside` scope is stored in SQLite preferences so it survives restart.
 - Logs may record scope changes and correlation IDs but not private command context.
 
-## 6. Planned modules
+## 6. Implemented modules
 
 ### `src/runtime/access-policy.ts`
 

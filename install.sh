@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPOSITORY_URL="https://github.com/bcain2121/furby-open.git"
-INSTALL_VERSION="v0.1.0-alpha.4"
+INSTALL_VERSION="v0.2.0-alpha.1"
 INSTALL_DIR="${FURBY_OPEN_INSTALL_DIR:-$HOME/FurbyOpen}"
 LOCAL_BIN="$HOME/.local/bin"
 

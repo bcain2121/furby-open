@@ -29,6 +29,23 @@ npm test
 npm audit --omit=dev --audit-level=critical
 ```
 
+## Access-scope operations
+
+Check the persisted and active scope from Telegram:
+
+```text
+/access
+/status
+```
+
+`/outside` immediately enables unrestricted host filesystem and shell access and persists it across restarts. Scheduled tasks use the same scope. Return to confinement with:
+
+```text
+/project
+```
+
+Scope changes abort and reset affected interactive and scheduled sessions so stale tool sets are not reused. If a migration leaves `FURBY_OPEN_TOOL_MODE` in `.env`, it is ignored; `npm run doctor` reports a compatibility warning without printing its value.
+
 ## Backup
 
 Stop writes or use SQLite's backup facilities, then preserve both database and workspace:
@@ -95,7 +112,7 @@ Ignored local personality, credentials, databases, sessions, workspace files, an
 Review the release notes before applying. To use a specific release rather than the newest one:
 
 ```bash
-FURBY_OPEN_UPDATE_TAG=v0.1.0-alpha.2 bash scripts/update.sh --apply
+FURBY_OPEN_UPDATE_TAG=v0.2.0-alpha.1 bash scripts/update.sh --apply
 ```
 
 If validation fails, do not delete private data or run an improvised hard reset. Keep the backup path printed by the updater and ask an installation agent to inspect the failure.

@@ -5,7 +5,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $RepositoryUrl = 'https://github.com/bcain2121/furby-open.git'
-$InstallVersion = 'v0.1.0-alpha.4'
+$InstallVersion = 'v0.2.0-alpha.1'
 
 function Write-Step([string]$Message) {
   Write-Host "`n== $Message ==" -ForegroundColor Cyan

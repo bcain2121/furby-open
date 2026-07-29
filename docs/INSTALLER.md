@@ -47,7 +47,7 @@ chmod +x install.sh
 ### macOS or Linux
 
 ```bash
-curl -fL https://raw.githubusercontent.com/bcain2121/furby-open/v0.1.0-alpha.4/install.sh -o install-furby-open.sh
+curl -fL https://raw.githubusercontent.com/bcain2121/furby-open/v0.2.0-alpha.1/install.sh -o install-furby-open.sh
 less install-furby-open.sh
 bash install-furby-open.sh
 ```
@@ -55,7 +55,7 @@ bash install-furby-open.sh
 ### Windows PowerShell
 
 ```powershell
-Invoke-WebRequest https://raw.githubusercontent.com/bcain2121/furby-open/v0.1.0-alpha.4/install.ps1 -OutFile "$env:TEMP\install-furby-open.ps1"
+Invoke-WebRequest https://raw.githubusercontent.com/bcain2121/furby-open/v0.2.0-alpha.1/install.ps1 -OutFile "$env:TEMP\install-furby-open.ps1"
 Get-Content "$env:TEMP\install-furby-open.ps1"
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:TEMP\install-furby-open.ps1"
 ```

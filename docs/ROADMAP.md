@@ -19,12 +19,12 @@ The project is not yet a polished general-public product. Its biggest gaps are o
 
 ## P1 — security and operations
 
-1. **Authenticate A2A before network expansion.** A2A is now disabled by default, forced to loopback, forced to safe mode, and limited to response tools. Add a real token or mutually authenticated transport before supporting reverse proxies or non-loopback use.
-2. **Replace safe/coding modes with explicit access scope.** Follow [`../plan.md`](../plan.md): keep the assistant fully capable, confine file tools to the project by default, make `/outside` immediately persist unrestricted access with a prominent warning and `/project` recovery instructions, let scheduled work follow the persisted owner scope, and keep A2A independently restricted.
+1. **Authenticate A2A before network expansion.** A2A is disabled by default, forced to loopback, independently purpose-restricted, and limited to response tools. Add a real token or mutually authenticated transport before supporting reverse proxies or non-loopback use.
+2. **Exercise the implemented access-scope model.** The [`../plan.md`](../plan.md) migration is implemented: project-confined file tools are default, `/outside` persists with a warning, `/project` revokes it, scheduled work follows owner scope, and A2A stays restricted. Prioritize upgrade fixtures and real platform/security testing before beta.
 3. **Add release provenance.** Generate checksums through the local release script, attach an SBOM, sign tags/assets where practical, and publish the exact commit and dependency audit with each release. Hosted workflow automation is optional, not a release prerequisite.
 4. **Harden optional source downloads.** Pin `whisper.cpp` to a reviewed tag or commit and verify downloaded model artifacts. The current optional installer follows the upstream default branch.
 5. **Add network timeouts and size policy everywhere.** Telegram setup has a timeout, but weather, media download, file send, and OpenAI transcription should share bounded timeout/retry helpers.
-6. **Define a private-data threat model.** Document what safe mode protects against, what the authorized model can still see, what coding mode can access, and which local processes can reach the loopback listener.
+6. **Deepen the private-data threat model.** The current policy documents project-scope `.env` access, protected database/key paths, persistent outside reach, and loopback exposure. Add adversarial tests and OS-specific assumptions for local processes and filesystem races.
 7. **Make updates equally native on Windows.** Installation is native, while updates, reset, backup examples, and some diagnostics still assume Bash. Provide PowerShell equivalents or a shared Node implementation.
 
 ## P2 — deepen the architecture

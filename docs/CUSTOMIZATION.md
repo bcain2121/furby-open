@@ -54,15 +54,11 @@ FALLBACK_MODEL=provider/model-id
 
 The `/model` command reads Pi's quick-select list from `~/.pi/agent/settings.json` when available.
 
-## Safe and coding modes
+## Project and outside access
 
-The default is:
+The default persistent scope is `project`. Furby can use all assistant capabilities and confined project file tools, including `.env` and `.data/personality.md`, but cannot use host Bash or paths outside the installation.
 
-```env
-FURBY_OPEN_TOOL_MODE=safe
-```
-
-Use `/security coding` only when filesystem and shell access are needed. Return to `/security safe` afterward.
+Use `/access` to inspect scope. `/outside` immediately enables persistent unrestricted host filesystem and shell tools for interactive and scheduled work; read the warning it returns. Use `/project` to restore project confinement.
 
 ## Commands
 
@@ -71,7 +67,7 @@ Native commands include:
 ```text
 /help /commands /status /model /models /skills
 /files /memories /transcript /sendfile
-/schedule /security /reset
+/schedule /access /outside /project /reset
 ```
 
 Unknown slash commands are forwarded to the Pi SDK when supported.

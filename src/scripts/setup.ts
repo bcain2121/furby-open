@@ -135,7 +135,8 @@ async function validateSetup() {
   console.log(`- Local configuration: ${doctorPassed ? 'ready' : 'needs attention above'}`);
   console.log(`- Telegram: ${telegramPassed ? 'verified' : 'not yet verified'}`);
   console.log(`- Model authentication: ${modelReady ? 'found' : 'not yet found; run npx pi and use /login'}`);
-  console.log('- Security mode: safe');
+  console.log('- Access scope: project (confined project files, no host Bash)');
+  console.log('- Telegram controls: /access checks scope, /outside enables persistent host access, /project restores confinement');
   console.log(`- Private personality: ${fs.existsSync(personalityPath) ? personalityPath : 'not configured'}`);
   console.log('\nYou can safely rerun npm run setup at any time. It will not print existing credentials.');
   console.log('Stop the assistant with Ctrl+C whenever it is running.');
@@ -154,6 +155,7 @@ async function main() {
   console.log('       Furby Open guided setup');
   console.log('========================================');
   console.log('\nNothing will be started automatically, and secret values must never be pasted into an AI chat.');
+  console.log('New installations use project-confined access. Only you can enable persistent host access later with /outside; /project turns it back off.');
 
   await configurePersonality();
   await configureTelegram();

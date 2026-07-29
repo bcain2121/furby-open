@@ -35,14 +35,14 @@ Warnings identify Claude-specific substitutions, frontmatter, and shell interpol
 
 ## Self-extension workflow
 
-1. Start in safe mode and describe the missing capability.
+1. Stay in default project scope and describe the missing capability.
 2. Review the proposed data access, tools, packages, and network services.
-3. Enable coding mode only if implementation is necessary.
-4. Ask the assistant to read `.pi/skills/skill-builder/SKILL.md`.
-5. Create the smallest project-local capability.
+3. Ask the assistant to read `.pi/skills/skill-builder/SKILL.md`.
+4. Create the smallest project-local capability with confined file tools.
+5. Use `/outside` only if host shell execution or package installation is actually required, and read its persistent-access warning.
 6. Review every file and dependency.
 7. Run focused validation, then the full build/test suite.
-8. Return to safe mode.
+8. Send `/project` when unrestricted host access is no longer needed.
 
 Example:
 

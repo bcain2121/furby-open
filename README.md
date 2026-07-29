@@ -2,7 +2,7 @@
 
 **A small, self-hosted personal AI agent for Telegram, powered by the Pi SDK.**
 
-Furby Open keeps the core understandable: one Telegram bot, one local SQLite database, Pi-native model access and sessions, a private file workspace, and an optional path for the assistant to add project-local skills when you explicitly enable coding mode.
+Furby Open keeps the core understandable: one Telegram bot, one local SQLite database, Pi-native model access and sessions, a private file workspace, and one always-capable assistant confined to its project by default.
 
 > **Alpha software:** review the security model before giving any AI agent access to your computer.
 
@@ -12,8 +12,8 @@ Furby Open keeps the core understandable: one Telegram bot, one local SQLite dat
 - **Local ownership:** memories, schedules, sessions, and uploaded files stay on your machine.
 - **Bring your own model:** use Pi-supported OAuth providers or API keys.
 - **Telegram-native:** talk to your assistant from a phone without hosting a web UI.
-- **Expandable:** add ordinary Pi skills under `.pi/skills/`; the assistant can help author them in opt-in coding mode.
-- **Safe public defaults:** confined read-only assistant tools and no A2A listener until you enable it.
+- **Expandable:** add ordinary Pi skills under `.pi/skills/`; the assistant can help author and validate them with project-confined file tools.
+- **Safe public defaults:** project-confined file access, no host shell, and no A2A listener until you enable it.
 
 ## Features
 
@@ -24,7 +24,7 @@ Furby Open keeps the core understandable: one Telegram bot, one local SQLite dat
 - Local Whisper transcription or optional OpenAI transcription
 - Private workspace with path and symlink confinement
 - Rapid-message batching and reliable chunked Telegram delivery
-- Safe and coding capability modes
+- Persistent project/outside access scopes with native Telegram controls
 - Optional localhost A2A JSON-RPC endpoint
 - Project-local starter skills for customization and skill creation
 - Cross-platform guided installer and private first-run setup
@@ -42,13 +42,13 @@ The installer opens one guided terminal flow for dependencies, personality, Tele
 
 ### macOS — double-click
 
-1. Download and unzip the [macOS/Linux installer bundle](https://github.com/bcain2121/furby-open/releases/download/v0.1.0-alpha.4/Furby-Open-Installer-macOS-Linux.zip).
+1. Download and unzip the [macOS/Linux installer bundle](https://github.com/bcain2121/furby-open/releases/download/v0.2.0-alpha.1/Furby-Open-Installer-macOS-Linux.zip).
 2. Double-click **`Install-Furby-Open.command`**.
 3. If macOS blocks it, Control-click it, choose **Open**, then confirm **Open**.
 
 ### Windows — double-click
 
-1. Download and unzip the [Windows installer bundle](https://github.com/bcain2121/furby-open/releases/download/v0.1.0-alpha.4/Furby-Open-Installer-Windows.zip).
+1. Download and unzip the [Windows installer bundle](https://github.com/bcain2121/furby-open/releases/download/v0.2.0-alpha.1/Furby-Open-Installer-Windows.zip).
 2. Double-click **`Install-Furby-Open.cmd`**.
 3. Approve Windows Package Manager prompts when you want the installer to add Git, Node.js, or FFmpeg.
 
@@ -57,7 +57,7 @@ The installer opens one guided terminal flow for dependencies, personality, Tele
 Download the installer, optionally inspect it, then run it:
 
 ```bash
-curl -fL https://raw.githubusercontent.com/bcain2121/furby-open/v0.1.0-alpha.4/install.sh -o install-furby-open.sh
+curl -fL https://raw.githubusercontent.com/bcain2121/furby-open/v0.2.0-alpha.1/install.sh -o install-furby-open.sh
 less install-furby-open.sh
 bash install-furby-open.sh
 ```
@@ -83,23 +83,17 @@ Point an agent with terminal access at the repository and use:
 
 Codex reads `AGENTS.md`; Claude Code is pointed to the same runbook by `CLAUDE.md`. The agent should own dependency installation and diagnostics while the user completes provider and Telegram authentication locally. A web-only chatbot without terminal access can guide the process but cannot install software on the computer.
 
-## Security Modes
+## Access Scopes
 
-Furby Open starts in **safe mode**:
-
-```env
-FURBY_OPEN_TOOL_MODE=safe
-```
-
-Safe mode exposes only explicitly approved read-only assistant tools for assistant data and the configured workspace. It does not expose Pi's broad filesystem `read` tool and cannot write files, save memory, change schedules, send files, or execute shell commands.
-
-Coding mode is explicit opt-in:
+Furby Open starts in persistent **project scope**. All ordinary assistant capabilities are available, including confined project `read`, `edit`, and `write`; host Bash and paths outside the canonical Furby Open root are unavailable.
 
 ```text
-/security coding
+/access     Show the current scope
+/outside    Immediately enable persistent host filesystem and shell access
+/project    Return to project-confined access
 ```
 
-Coding mode gives the model `read`, `bash`, `edit`, and `write`, plus all registered assistant tools. This is powerful and can affect files outside the repository. Read [`SECURITY.md`](SECURITY.md) first.
+`/outside` takes effect without a second challenge and persists across sessions, updates, and restarts. Its response warns that the model and scheduled tasks can use OS-account-accessible files and host shell commands until `/project` is sent. Project scope intentionally permits `.env` and related project configuration, so secret-disclosure rules still apply. Read [`SECURITY.md`](SECURITY.md) first.
 
 ## Extending the Assistant
 
@@ -114,7 +108,7 @@ The repository includes:
 - `assistant-customizer` — safely personalize identity and behavior
 - `skill-builder` — design, implement, and validate a new local skill
 
-In coding mode, you can ask:
+In project scope, you can ask:
 
 > Create a project-local Pi skill that helps me summarize my weekly notes. Show me the files and validation before using it.
 
@@ -165,7 +159,7 @@ flowchart LR
   A[Optional localhost A2A] --> R
 ```
 
-More detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For a file-by-file source map, see [`tree.md`](tree.md). The prioritized maturity plan is in [`docs/ROADMAP.md`](docs/ROADMAP.md). The proposed replacement of safe/coding modes with project/outside access scopes is specified in [`plan.md`](plan.md); it is not implemented yet.
+More detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For a file-by-file source map, see [`tree.md`](tree.md). The prioritized maturity plan is in [`docs/ROADMAP.md`](docs/ROADMAP.md). The implemented project/outside security model and its acceptance criteria are recorded in [`plan.md`](plan.md).
 
 ## Private Data
 

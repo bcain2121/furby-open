@@ -16,7 +16,7 @@ Customize the current Furby Open checkout while preserving privacy and upgradeab
 5. Put identity and machine-specific values in `.env`.
 6. Put the owner's private tone, interests, communication preferences, and behavioral requests in `.data/personality.md`. This ignored local override is loaded after the public default persona.
 7. Change `src/config/system.md` or `src/config/soul.md` only when contributing a generic default that belongs in the public project, not for an individual installation.
-8. Do not weaken safe mode, Telegram user authentication, workspace confinement, or localhost network defaults.
+8. Do not weaken project confinement, persistent access controls, Telegram user authentication, workspace confinement, or localhost network defaults.
 9. Show the proposed local personality summary before applying broad changes. Do not place secrets or unnecessary sensitive facts in the personality file.
 10. After changes, run:
 

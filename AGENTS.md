@@ -7,7 +7,7 @@ Furby Open is the public, reusable edition of a minimal Telegram personal assist
 - This repository must remain independent from any private Furby Assistant installation.
 - Never copy private `.env` files, databases, sessions, logs, uploads, OAuth files, or personal skills into this repository.
 - Do not add machine-specific absolute paths or personal names, addresses, email addresses, phone numbers, account IDs, or business data.
-- Public defaults must remain safe: safe tool mode, A2A disabled, localhost binding when enabled, and empty credentials.
+- Public defaults must remain safe: persistent project scope, no host Bash in project scope, A2A disabled, localhost binding when enabled, and empty credentials.
 
 ## Architecture
 
@@ -33,7 +33,7 @@ Required installer behavior:
 7. Preview external skills with `npm run skills:import -- --list`; import nothing without explicit approval.
 8. Run doctor, build, tests, and credential verification. Explain every failure or warning in plain language.
 9. Start with `npm start` only after all blocking checks pass and the user approves startup.
-10. Keep safe mode as the default. Explain coding mode before enabling it.
+10. Keep project scope as the default. Never activate `/outside` on the user's behalf; explain that it is immediate, persistent, applies to scheduled tasks, and returns to confinement only with `/project`.
 11. Never reuse another assistant's Telegram token, database, workspace, sessions, process name, or A2A port.
 12. Explain safe updates with `bash scripts/update.sh --check` and `bash scripts/update.sh --apply` before finishing.
 
