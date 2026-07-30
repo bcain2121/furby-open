@@ -68,7 +68,7 @@ The project is not yet a polished general-public product. Its biggest gaps are o
 
 - **Files:** Configuration, resource loading, access policy, setup, skills, storage, and future Docker assets.
 - **Problem:** One checkout currently serves as immutable application source and the assistant's writable project/configuration root. Container recreation would discard source-layer edits or require mounting over the application image.
-- **Solution:** Follow [`DOCKER_FEASIBILITY.md`](DOCKER_FEASIBILITY.md): separate application, project, state, workspace, and Pi-agent roots while preserving current native defaults.
+- **Solution:** Follow [`DOCKER_FEASIBILITY.md`](DOCKER_FEASIBILITY.md) and its deferred [`DOCKER_IMPLEMENTATION_PLAN.md`](DOCKER_IMPLEMENTATION_PLAN.md): separate application, project, state, workspace, and Pi-agent roots while preserving current native defaults.
 - **Benefits:** Clean Docker images, portable backups, durable local skills, truthful container access semantics, and simpler moves between computers.
 
 ## P3 — product maturity

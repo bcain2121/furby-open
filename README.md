@@ -161,7 +161,7 @@ flowchart LR
 
 More detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For a file-by-file source map, see [`tree.md`](tree.md). The prioritized maturity plan is in [`docs/ROADMAP.md`](docs/ROADMAP.md). The implemented project/outside security model and its acceptance criteria are recorded in [`plan.md`](plan.md).
 
-Docker is being evaluated as an optional portable deployment, not yet a supported installer. See [`docs/DOCKER_FEASIBILITY.md`](docs/DOCKER_FEASIBILITY.md) for the benefits, security differences, persistent-data design, and prerequisites before a container image should be published.
+Docker is being evaluated as an optional portable deployment, not yet a supported installer. See [`docs/DOCKER_FEASIBILITY.md`](docs/DOCKER_FEASIBILITY.md) for the assessment and [`docs/DOCKER_IMPLEMENTATION_PLAN.md`](docs/DOCKER_IMPLEMENTATION_PLAN.md) for the deferred implementation checklist.
 
 ## Private Data
 

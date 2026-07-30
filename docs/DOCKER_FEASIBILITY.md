@@ -2,6 +2,8 @@
 
 **Status:** Recommended as an optional deployment path after a small architecture split; not implemented or locally validated yet.
 
+The deferred, owner-executable checklist is in [`DOCKER_IMPLEMENTATION_PLAN.md`](DOCKER_IMPLEMENTATION_PLAN.md).
+
 ## Recommendation
 
 Docker can make Furby Open easier to reproduce, update, back up, and move between computers, especially once a prebuilt `linux/amd64` + `linux/arm64` image exists. It should supplement rather than replace the native installer:
