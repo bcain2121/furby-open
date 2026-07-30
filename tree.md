@@ -157,6 +157,7 @@ furby-open/
 docs/
 ├── ARCHITECTURE.md
 ├── CUSTOMIZATION.md
+├── DOCKER_FEASIBILITY.md
 ├── EXTENDING.md
 ├── INSTALLER.md
 ├── INSTALL_WITH_AI.md
@@ -166,8 +167,9 @@ docs/
 └── SETUP.md
 ```
 
-- **`docs/ARCHITECTURE.md`** — System responsibilities, request flow, purpose-isolated sessions, capability/resource policy, persistence, workspace, scheduler, A2A, and private-data locations.
-- **`docs/CUSTOMIZATION.md`** — Supported identity, personality, model, mode, and command customization without editing public security defaults.
+- **`docs/ARCHITECTURE.md`** — System responsibilities, request flow, purpose-isolated sessions, access/resource policy, persistence, workspace, scheduler, A2A, and private-data locations.
+- **`docs/CUSTOMIZATION.md`** — Supported identity, personality, model, access-scope, and command customization without editing public security defaults.
+- **`docs/DOCKER_FEASIBILITY.md`** — Optional-container assessment covering benefits, deployment-root refactor, access semantics, persistent state, backup/migration, multi-architecture images, and phased validation.
 - **`docs/EXTENDING.md`** — Skill-first extension guidance, external skill imports, self-extension workflow, and criteria for application code versus a skill.
 - **`docs/INSTALLER.md`** — Platform-specific installer behavior, trust, custom locations, resume rules, troubleshooting, checksums, and uninstall instructions.
 - **`docs/INSTALL_WITH_AI.md`** — Stage-by-stage runbook for a terminal-capable coding agent helping a nontechnical owner without handling credentials.

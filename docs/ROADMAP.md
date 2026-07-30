@@ -39,7 +39,7 @@ The project is not yet a polished general-public product. Its biggest gaps are o
 ### 2. Telegram command module
 
 - **Files:** `src/bot/commands.ts`, `src/bot/telegram.ts`, scheduler and storage callers.
-- **Problem:** One long conditional dispatcher knows parsing, HTML presentation, preferences, models, memory, media, schedules, security modes, and Pi passthrough rules.
+- **Problem:** One long conditional dispatcher knows parsing, HTML presentation, preferences, models, memory, media, schedules, persistent access scopes, and Pi passthrough rules.
 - **Solution:** Deepen command dispatch into a registry of command modules with shared formatting and authorization context, while keeping one external command-handler seam.
 - **Benefits:** Locality for each command family, simpler help generation, and integration tests that exercise the same interface as production.
 
@@ -63,6 +63,13 @@ The project is not yet a polished general-public product. Its biggest gaps are o
 - **Problem:** Timeouts, retries, error normalization, limits, and logging are implemented independently.
 - **Solution:** Consolidate bounded HTTP and process execution behavior behind shared internal modules without creating hypothetical adapters where only one implementation exists.
 - **Benefits:** Consistent failure behavior and one test surface for resource limits.
+
+### 6. Deployment and persistent-root separation
+
+- **Files:** Configuration, resource loading, access policy, setup, skills, storage, and future Docker assets.
+- **Problem:** One checkout currently serves as immutable application source and the assistant's writable project/configuration root. Container recreation would discard source-layer edits or require mounting over the application image.
+- **Solution:** Follow [`DOCKER_FEASIBILITY.md`](DOCKER_FEASIBILITY.md): separate application, project, state, workspace, and Pi-agent roots while preserving current native defaults.
+- **Benefits:** Clean Docker images, portable backups, durable local skills, truthful container access semantics, and simpler moves between computers.
 
 ## P3 — product maturity
 
